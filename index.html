@@ -410,276 +410,36 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:0;-webkit-bo
 /* ====== 여기만 고치면 내용이 바뀝니다 (관리자 페이지의 '코드 복사'로 만든 코드를 통째로 붙여 넣어도 돼요) ====== */
 // img: 이미지 파일 경로 (예: "img/photo1.jpg"). 비워 두면 그라데이션이 표시됩니다.
 const DEFAULT = {
-  "profile": {
-    "name": "U2",
-    "bio": "Ai Chat",
-    "tag": "#극온리/이입 #1T1D",
-    "blog": "iCloud",
-    "photo": "img/mw2axqudmv11.jpg"
-  },
-  "covers": {
-    "notice": "NOTICE",
-    "list": "목록형 커버",
-    "gallery": "갤러리형 커버"
-  },
-  "categories": [
-    {
-      "name": "분류 전체보기",
-      "children": []
-    },
-    {
-      "name": "LOG",
-      "children": [
-        {
-          "name": "7",
-          "children": []
-        },
-        {
-          "name": "임찬희",
-          "children": []
-        },
-        {
-          "name": "류보민",
-          "children": []
-        }
-      ],
-      "view": "list"
-    },
-    {
-      "name": "ASSET",
-      "children": [
-        {
-          "name": "7",
-          "children": []
-        },
-        {
-          "name": "임찬희",
-          "children": []
-        },
-        {
-          "name": "류보민",
-          "children": []
-        }
-      ],
-      "view": "thumb"
-    },
-    {
-      "name": "MEMO",
-      "children": [],
-      "view": "webzine"
-    }
+  profile:{ name:"유니콘 Yunicorn", bio:"나는 지금의 이야기를 하고 있는 거야", tag:"#MyHomepage", blog:"iCloud", photo:"" },
+  covers:{ notice:"공지사항 커버", list:"목록형 커버", gallery:"갤러리형 커버" },
+  // 카테고리: children 안에 또 children을 넣으면 하위 카테고리가 돼요
+  // view: 보이는 방식 (list=목록형, thumb=썸네일, webzine=웹진형, chat=대화형, video=동영상). 비우면 상위 카테고리를 따라가요
+  categories:[
+    { name:"분류 전체보기", children:[] },
+    { name:"목록형", view:"list", children:[ { name:"하위 카테고리", children:[] }, { name:"빈 카테고리", children:[] } ] },
+    { name:"썸네일", view:"thumb", children:[ { name:"갤러리형", children:[] } ] },
+    { name:"웹진형", view:"webzine", children:[] },
+    { name:"대화형", view:"chat", children:[] },
+    { name:"동영상", view:"video", children:[] }
   ],
-  "posts": [
-    {
-      "title": "임찬희 비공식",
-      "type": "ASSET > 임찬희",
-      "side": "",
-      "date": "2026년 11월 5일",
-      "pw": "0220",
-      "text": "[[img:1]]\n\n[[img:2]]\n\n[[img:3]]\n\n[[img:4]]\n\n[[img:5]]\n\n[[img:6]]\n\n[[img:7]]\n\n[[img:8]]\n\n[[img:9]]\n\n[[img:10]]\n\n[[img:11]]\n\n[[img:12]]\n\n[[img:13]]\n\n[[img:14]]\n\n[[img:15]]\n\n[[img:16]]\n\n[[img:17]]\n\n[[img:18]]\n\n[[img:19]]\n\n[[img:20]]\n\n[[img:21]]\n\n[[img:22]]\n\n[[img:23]]\n\n[[img:24]]\n\n[[img:25]]\n\n[[img:26]]\n\n[[img:27]]\n\n[[img:28]]\n\n[[img:29]]\n\n[[img:30]]\n\n[[img:31]]\n\n[[img:32]]",
-      "img": "",
-      "color": [
-        "#7a93c9",
-        "#eadfc8"
-      ],
-      "images": [
-        {
-          "id": 1,
-          "src": "img/mw2ld55crxua.jpg"
-        },
-        {
-          "id": 2,
-          "src": "img/mw2ld70ccu0q.jpg"
-        },
-        {
-          "id": 3,
-          "src": "img/mw2ld8fluzht.jpg"
-        },
-        {
-          "id": 4,
-          "src": "img/mw2lda3f4sxb.jpg"
-        },
-        {
-          "id": 5,
-          "src": "img/mw2ldboo3qi7.jpg"
-        },
-        {
-          "id": 6,
-          "src": "img/mw2lddadln1y.jpg"
-        },
-        {
-          "id": 7,
-          "src": "img/mw2lderzxkdz.jpg"
-        },
-        {
-          "id": 8,
-          "src": "img/mw2ldgj87prx.jpg"
-        },
-        {
-          "id": 9,
-          "src": "img/mw2ldhyl2s76.jpg"
-        },
-        {
-          "id": 10,
-          "src": "img/mw2ldjro5618.jpg"
-        },
-        {
-          "id": 11,
-          "src": "img/mw2ldlhxroof.jpg"
-        },
-        {
-          "id": 12,
-          "src": "img/mw2ldmsoxuvy.jpg"
-        },
-        {
-          "id": 13,
-          "src": "img/mw2ldoke3vab.jpg"
-        },
-        {
-          "id": 14,
-          "src": "img/mw2ldq9qozml.jpg"
-        },
-        {
-          "id": 15,
-          "src": "img/mw2ldrz7bvnb.jpg"
-        },
-        {
-          "id": 16,
-          "src": "img/mw2ldtrex8u6.jpg"
-        },
-        {
-          "id": 17,
-          "src": "img/mw2ldvdynzp5.jpg"
-        },
-        {
-          "id": 18,
-          "src": "img/mw2ldx0adm09.jpg"
-        },
-        {
-          "id": 19,
-          "src": "img/mw2ldy9ehnxo.jpg"
-        },
-        {
-          "id": 20,
-          "src": "img/mw2ldzjwrkhd.jpg"
-        },
-        {
-          "id": 21,
-          "src": "img/mw2le0ve634o.jpg"
-        },
-        {
-          "id": 22,
-          "src": "img/mw2le2oqlrh9.jpg"
-        },
-        {
-          "id": 23,
-          "src": "img/mw2le40231tt.jpg"
-        },
-        {
-          "id": 24,
-          "src": "img/mw2le5bdh5ui.jpg"
-        },
-        {
-          "id": 25,
-          "src": "img/mw2le6qh7klf.jpg"
-        },
-        {
-          "id": 26,
-          "src": "img/mw2le8fklco9.jpg"
-        },
-        {
-          "id": 27,
-          "src": "img/mw2le9q1itxp.jpg"
-        },
-        {
-          "id": 28,
-          "src": "img/mw2leb6nafgi.jpg"
-        },
-        {
-          "id": 29,
-          "src": "img/mw2leci9dznu.jpg"
-        },
-        {
-          "id": 30,
-          "src": "img/mw2lee4x6v8f.jpg"
-        },
-        {
-          "id": 31,
-          "src": "img/mw2lefzi1klc.jpg"
-        },
-        {
-          "id": 32,
-          "src": "img/mw2leh937kga.jpg"
-        }
-      ],
-      "files": []
-    }
+  posts:[
+    { title:"첫 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 10월 29일", img:"", color:["#6f8fc7","#e9d9b8"] },
+    { title:"두 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#1c1c1c","#a82a2a"] },
+    { title:"세 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#d33a3a","#f4e6d2"] },
+    { title:"네 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#5d7a68","#d8cfa8"] }
   ],
-  "notices": [
-    {
-      "title": "LIST",
-      "date": "2026년 11월 5일",
-      "text": "\n{{hl:#111111,#ffffff|1,000턴 이상}} 진행한 친구들만 기재\n메인 배려는 따로 표기\n\n@qwerty  {{hl:#111111,#ffffff|7}}\n@kit {{hl:#111111,#ffffff|임찬희/류보민}}\n@puppy3 스즈미야 토오루\n@meowmoon Dante Romano\n@psmoke_nonsmoker 냐냐냥(지새벽)",
-      "img": "",
-      "images": [],
-      "files": []
-    },
-    {
-      "title": "NOTICE",
-      "date": "2026년 11월 5일",
-      "text": "{{hl:#111111,#ffffff|미(ミ) / 유이}} 그 외 다른 닉네임 언급 X\n로그 80% 에셋 20%\nONLY 1T3D \n\n{{hl:#111111,#ffffff|Teapot · Caveduck}} 外 다양판 플랫폼 이용하나 메인은 두 플랫폼 이용하고 있습니다\n{{hl:#111111,#ffffff|상호 배려가 어려운 경우}}는 절대 흔적 남기지 말아 주세요\n캐릭터에 대한 본명 언급 有 스포일러가 될 수 있습니다\n\n{{hl:#111111,#ffffff|NG}}\n- 드림 지우기, 견체 및 사찰\n- 허공저격, 발콕콕, 이슈에 말 심하게 얹으시는 분\n",
-      "img": "",
-      "images": [],
-      "files": []
-    }
+  notices:[
+    { title:"Notice 3 : Image, Text", date:"2026년 10월 29일", img:"", color:["#3f6fb3","#e0a96a"], text:"여기에 공지 내용을 입력하세요. 이미지와 텍스트를 함께 올릴 수 있어요." },
+    { title:"Notice 2 : Text",  date:"2024년 12월 15일", text:"텍스트만 있는 공지 예시입니다." },
+    { title:"Notice 1 : Image", date:"2024년 7월 19일",  img:"", color:["#9bb6d8","#efe7d8"], text:"" }
   ],
-  "tracks": [
-    {
-      "title": "Gorillaz - Feel Good Inc.",
-      "src": "https://youtu.be/-Fp0aTedjwI?si=fscXu4js1DFS1arr"
-    },
-    {
-      "title": "Gwen Stefani - Luxurious",
-      "src": "https://youtu.be/vIhlZKxi8AU?si=pVRruAgikz5NSL0P"
-    },
-    {
-      "title": "Mae Muller - Anticlimax",
-      "src": "https://youtu.be/utN3q6TiooE?si=gDHypQXlFaUJBRI7"
-    },
-    {
-      "title": "Isabel LaRosa - Famous ",
-      "src": "https://youtu.be/PCMdcIr02UE?si=E5HpX8xYyUADWMZ2"
-    },
-    {
-      "title": "Nujabes - Reflection Eternal",
-      "src": "https://youtu.be/GLGM8fxL020?si=XIzpfklOSN6qv7Rh"
-    },
-    {
-      "title": "Nujabes - aruarian dance",
-      "src": "https://youtu.be/qYcoJpqCha4?si=BHO8xisY2iMJkDzz"
-    },
-    {
-      "title": "Childish Gambino - Redbone",
-      "src": "https://youtu.be/CWUxKMF2w2U?si=PVozsL4bj-fPLpKT"
-    }
-  ],
-  "links": [],
-  "gh": {
-    "user": "luvme11",
-    "repo": "u2home"
-  },
-  "chat": {
-    "aName": "달",
-    "aHandle": "@moontsuki",
-    "aPhoto": "",
-    "bName": "해파리",
-    "bHandle": "@kurage",
-    "bPhoto": ""
-  },
-  "admin": {
-    "pw": "0220",
-    "vol": 8
-  }
+  tracks:[],   // 예: { title:"곡 제목", src:"https://youtu.be/영상아이디" }  (mp3 경로도 가능)
+  links:[],    // 예: { title:"트위터", url:"https://..." }
+  gh:{ user:"", repo:"" },
+  // 관리자 비밀번호 (관리자 > 홈에서 바꾸고 '코드 복사'로 올리면 모든 기기에 적용돼요)
+  admin:{ pw:"admin1234" },
+  // 대화형 분류의 두 사람 (프로필 이미지는 비우면 기본 아이콘)
+  chat:{ aName:"달", aHandle:"@moontsuki", aPhoto:"", bName:"해파리", bHandle:"@kurage", bPhoto:"" }
 };
 /* ========================================= */
 
@@ -798,6 +558,7 @@ $("#memo-items").addEventListener("click", e => {
 function fmt(s){
   const L = [];
   s = esc(s).replace(/\[([^\]\n]+)\]\((https?:\/\/[^\s)]+)\)/g, (m,t,u) => { L.push([t,u]); return "\u0001" + (L.length-1) + "\u0001"; });
+  s = s.replace(/(^|[\s(])(https?:\/\/(?:(?!&quot;|&lt;|&gt;)[^\s])+)/g, (m, pre, u) => { const t = (u.match(/[.,!?;:)\]]+$/) || [""])[0]; if(t) u = u.slice(0, -t.length); L.push([u, u]); return pre + "\u0001" + (L.length-1) + "\u0001" + t; });
   s = s.replace(/\*\*([^*\n]+)\*\*/g, "<strong>$1</strong>")
        .replace(/==([^=\n]+)==/g, '<strong class="hl">$1</strong>')
        .replace(/__([^_\n]+)__/g, "<u>$1</u>")
@@ -817,6 +578,14 @@ function ytEmbed(y){
   return `<div class="yt"><iframe src="https://www.youtube.com/embed/${y.id}" title="YouTube video" loading="lazy" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe></div>` +
     (y.cap ? `<div class="ytc">${esc(y.cap)}</div>` : "");
 }
+function linkLine(line){
+  const m = String(line).trim().match(/^(https?:\/\/[^\s|]+)(?:\s*\|\s*(.+))?$/);
+  return m ? { url:m[1], title:(m[2] || "").trim() } : null;
+}
+function linkCard(k){
+  let host = k.url; try{ host = new URL(k.url).hostname.replace(/^www\./, ""); }catch(e){}
+  return `<a class="fcard lcard" href="${esc(k.url)}" target="_blank" rel="noopener noreferrer"><span class="fic">${linkIcon}</span><span class="fin"><b>${esc(k.title || host)}</b><small>${esc(host)}</small></span></a>`;
+}
 function fileCard(f){
   const sz = f.size ? (f.size / 1048576).toFixed(2) + "MB" : "";
   return `<a class="fcard" href="${esc(f.src)}" download="${esc(f.name)}"${f.path ? ' target="_blank" rel="noopener"' : ""}><span class="fic"><svg viewBox="0 0 16 16"><path d="M8 2.5v8M4.8 7.6L8 10.8l3.2-3.2M3 13h10"/></svg></span><span class="fin"><b>${esc(f.name)}</b>${sz ? `<small>${sz}</small>` : ""}</span></a>`;
@@ -835,10 +604,11 @@ function bodyHtml(p){
     const flushP = () => { const s = buf.join("\n").replace(/^\n+|\n+$/g, ""); if(s.trim()) out.push(`<p>${fmt(s)}</p>`); buf = []; };
     const flushQ = () => { if(q){ out.push(`<blockquote class="q q${q.n}">${q.l.map(fmt).join("<br>")}</blockquote>`); q = null; } };
     t.split("\n").forEach(line => {
-      const qm = line.match(/^(>{1,3}) ?(.*)$/), yt = ytLine(line);
+      const qm = line.match(/^(>{1,3}) ?(.*)$/), yt = ytLine(line), lc = linkLine(line);
       if(qm){ flushP(); const n = qm[1].length; if(q && q.n !== n) flushQ(); if(!q) q = { n, l:[] }; q.l.push(qm[2]); return; }
       flushQ();
       if(yt){ flushP(); out.push(ytEmbed(yt)); return; }
+      if(lc){ flushP(); out.push(linkCard(lc)); return; }
       buf.push(line);
     });
     flushP(); flushQ();
@@ -847,7 +617,7 @@ function bodyHtml(p){
 }
 // 웹진형 목록용 미리보기 글
 function excerpt(p){
-  return String(p.text || "").replace(/\[\[(?:img|file):\d+\]\]/g, " ").split("\n").filter(l => !ytLine(l)).map(l => l.replace(/^>{1,3} ?/, "")).join(" ")
+  return String(p.text || "").replace(/\[\[(?:img|file):\d+\]\]/g, " ").split("\n").filter(l => !ytLine(l) && !linkLine(l)).map(l => l.replace(/^>{1,3} ?/, "")).join(" ")
     .replace(/\{\{(?:hl:[^|}]*|sz:[a-z]+)\|([^}]*)\}\}/g, "$1").replace(/\[([^\]]+)\]\(https?:[^)]*\)/g, "$1").replace(/(\*\*|==|__|~~|\*)/g, "").replace(/\s+/g, " ").trim().slice(0, 90);
 }
 const padlock = '<svg class="pl" viewBox="0 0 12 12" width="10" height="10" aria-hidden="true"><path d="M3.5 5.2V4a2.5 2.5 0 015 0v1.2" fill="none" stroke="currentColor" stroke-width="1.2"/><rect x="2" y="5" width="8" height="6" rx="1.4" fill="currentColor"/></svg>';
@@ -1422,14 +1192,14 @@ function imgBox(){
 }
 // 서식 버튼 / 유튜브 / 첨부파일
 function fmtBar(){
-  const B = [["b","굵게"],["i","기울임"],["u","밑줄"],["s","취소선"],["sz-s","작게"],["sz-l","크게"],["sz-xl","더 크게"],["link","링크"],["q1","인용 ❝"],["q2","인용 ┃"],["q3","인용 ▣"],["yt","유튜브"],["clr","서식 지우기"]];
+  const B = [["b","굵게"],["i","기울임"],["u","밑줄"],["s","취소선"],["sz-s","작게"],["sz-l","크게"],["sz-xl","더 크게"],["link","링크(글자)"],["lc","링크 카드"],["q1","인용 ❝"],["q2","인용 ┃"],["q3","인용 ▣"],["yt","유튜브"],["clr","서식 지우기"]];
   const BG = [["#fff2a8","#222222","노랑"],["#ffd1e0","#222222","분홍"],["#d4f5dd","#222222","초록"],["#d6e6ff","#222222","파랑"],["#e6dcff","#222222","보라"],["#111111","#ffffff","검정"]];
   const FG = [["#e5484d","빨강"],["#f08c00","주황"],["#2f9e5b","초록"],["#3b82f6","파랑"],["#8b5cf6","보라"],["#888888","회색"]];
   const hl = `<div class="hlbar"><div class="hr"><b>형광펜</b>${BG.map(([b,f,l]) => `<button class="btn sw" data-a="hlp" data-bg="${b}" data-fg="${f}" style="background:${b};color:${f};border-color:${b}">${l}</button>`).join("")}</div>
     <div class="hr"><b>글씨 색</b>${FG.map(([c,l]) => `<button class="btn sw" data-a="hlp" data-bg="" data-fg="${c}" style="color:${c}">${l}</button>`).join("")}</div>
     <div class="hr"><b>직접 고르기</b><label><input type="checkbox" id="hl-usebg" checked>배경</label><input type="color" id="hl-bg" value="#fff2a8"><label><input type="checkbox" id="hl-usefg">글씨</label><input type="color" id="hl-fg" value="#e5484d"><button class="btn pri" data-a="hlc">적용</button></div></div>`;
   return `<div class="btns" style="margin:4px 0 0">${B.map(([f,l]) => `<button class="btn" data-a="fmt" data-f="${f}">${l}</button>`).join("")}</div>
-    ${hl}<p style="margin:6px 0 4px">글자를 드래그해 선택한 뒤 버튼을 누르면 서식이 적용돼요. 유튜브는 주소만 한 줄에 붙여 넣어도 영상 플레이어로 바뀌어요(주소 뒤에 <code> | 설명</code>을 붙이면 설명이 같이 나와요).</p>`;
+    ${hl}<p style="margin:6px 0 4px">글자를 드래그해 선택한 뒤 버튼을 누르면 서식이 적용돼요. 링크는 <b>링크(글자)</b>로 글자에 걸거나, <b>링크 카드</b>로 눌러서 이동하는 카드를 넣어요(주소만 한 줄에 써도 카드가 되고, <code>주소 | 제목</code>으로 제목도 정할 수 있어요). 글 중간에 쓴 https 주소는 자동으로 눌러지는 링크가 돼요. 유튜브는 주소만 한 줄에 붙여 넣어도 영상 플레이어로 바뀌어요(주소 뒤에 <code> | 설명</code>을 붙이면 설명이 같이 나와요).</p>`;
 }
 function doFmt(f){
   const ta = AM.querySelector("#body-ta"); if(!ta) return;
@@ -1446,6 +1216,10 @@ function doFmt(f){
   } else if(f === "link"){
     const u = prompt("링크 주소 (https://...)"); if(!u || !u.trim()) return;
     const t = sel || "링크 글자"; rep = `[${t}](${u.trim()})`; a0 = s + 1; a1 = a0 + t.length;
+  } else if(f === "lc"){
+    const u = prompt("링크 주소 (https://...)"); if(!u || !/^https?:\/\//i.test(u.trim())){ if(u) alert("주소는 http:// 또는 https:// 로 시작해야 해요."); return; }
+    const t = prompt("카드에 보여줄 제목 (비워 두면 사이트 주소가 나와요)", sel || "");
+    insTok(ta, u.trim() + (t && t.trim() ? " | " + t.trim() : ""), "cur"); return;
   } else if(f === "yt"){
     const u = prompt("유튜브 주소를 붙여 넣으세요"); if(!u || !u.trim()) return;
     insTok(ta, u.trim(), "cur"); return;
