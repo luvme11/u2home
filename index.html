@@ -596,7 +596,10 @@ function htmlFrame(code){
   const id = ++hfN;
   const doc = '<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base target="_blank">' +
     '<style>html,body{margin:0;padding:0}body{font:13px/1.6 Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;overflow-wrap:anywhere}img,video,iframe{max-width:100%}</style>' +
-    code + '<script>(function(){var s=function(){parent.postMessage({hframe:' + id + ',h:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*")};' +
+    code + '<script>(function(){var L=["수정 모드","HTML 코드 받기"],T=function(b){var t=b.textContent.replace(/\\s+/g," ");return L.some(function(x){return t.indexOf(x)>-1})},Q="button,a,[role=button]";' +
+    'var H=function(){[].forEach.call(document.querySelectorAll(Q),function(b){if(b.dataset.x||!T(b))return;var el=b;while(el.parentElement&&el.parentElement!==document.body&&el.parentElement!==document.documentElement){var p=el.parentElement,k=[].slice.call(p.querySelectorAll(Q));if(!k.every(T)||p.textContent.replace(/\\s/g,"")!==k.map(function(x){return x.textContent.replace(/\\s/g,"")}).join(""))break;el=p}el.style.display="none";b.dataset.x=1})};' +
+    'H();new MutationObserver(H).observe(document.documentElement,{childList:true,subtree:true});' +
+    'var s=function(){parent.postMessage({hframe:' + id + ',h:Math.ceil(document.documentElement.getBoundingClientRect().height)},"*")};' +
     'if(window.ResizeObserver)new ResizeObserver(s).observe(document.documentElement);addEventListener("load",s);s();})();<\/script>';
   return `<iframe class="hframe" id="hf${id}" sandbox="allow-scripts allow-popups allow-popups-to-escape-sandbox" loading="lazy" srcdoc="${esc(doc)}"></iframe>`;
 }
