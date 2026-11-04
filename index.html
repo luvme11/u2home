@@ -119,6 +119,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .btns{display:flex;gap:6px;margin-top:10px;flex-wrap:wrap}
 .btn{border:1px solid var(--line);background:var(--chip);border-radius:99px;padding:2px 12px;font-size:11px;color:var(--strong);display:inline-block}
 .btn:hover{color:var(--accent);border-color:var(--accent)}
+.btn[disabled]{opacity:.35;pointer-events:none}
 .btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
 .msg{font-size:11px;margin-top:8px;min-height:16px;color:var(--accent)}
 .trow{display:grid;grid-template-columns:1fr 90px 120px 108px;gap:8px;align-items:center;padding:7px 10px;border-bottom:1px solid var(--line)}
@@ -1081,6 +1082,13 @@ function formView(name){
 }
 // 카테고리 관리 (카테고리 안에 카테고리를 계속 넣을 수 있어요)
 function pathOf(idx){ const names = []; let list = categories; for(const i of idx){ names.push(list[i].name); list = list[i].children; } return names; }
+// 같은 단계 안에서 위/아래로 순서 바꾸기 (‘분류 전체보기’는 맨 위에 고정)
+function mvBtns(f){
+  const sib = listAt(f.idx.slice(0, -1)), i = f.idx[f.idx.length - 1], P = f.idx.join(",");
+  const pinned = f.depth === 0 && sib[0] && sib[0].name === ALL;
+  const upOff = i === 0 || (pinned && i === 1), dnOff = i === sib.length - 1;
+  return `<button class="btn" data-a="cmu" data-p="${P}" ${upOff ? "disabled" : ""} title="위로">▲</button><button class="btn" data-a="cmd" data-p="${P}" ${dnOff ? "disabled" : ""} title="아래로">▼</button>`;
+}
 function catView(){
   if(edit){
     const isNew = edit.mode === "new";
@@ -1097,9 +1105,9 @@ function catView(){
       <div class="btns"><button class="btn pri" data-a="csave">저장</button><button class="btn" data-a="cancel">취소</button></div>`;
   }
   const rows = flatCats(categories).map(f => `<div class="crow"><span class="nm" style="padding-left:${f.depth*18}px">${f.depth ? "└ " : ""}${esc(f.node.name)}${(f.depth === 0 && f.node.name === ALL) ? "" : `<small style="opacity:.6;font-size:11px;margin-left:8px">${VIEWS[viewOf(f.path.join(SEP))]}${f.node.view || f.depth === 0 ? "" : " (상위와 같게)"}</small>`}</span>
-    <span class="acts"><button class="btn" data-a="cadd" data-p="${f.idx.join(",")}">+ 하위</button><button class="btn" data-a="cedit" data-p="${f.idx.join(",")}">수정</button><button class="btn" data-a="cdel" data-p="${f.idx.join(",")}">삭제</button></span></div>`).join("");
+    <span class="acts">${(f.depth === 0 && f.node.name === ALL) ? "" : mvBtns(f)}<button class="btn" data-a="cadd" data-p="${f.idx.join(",")}">+ 하위</button><button class="btn" data-a="cedit" data-p="${f.idx.join(",")}">수정</button><button class="btn" data-a="cdel" data-p="${f.idx.join(",")}">삭제</button></span></div>`).join("");
   return `<div class="btns" style="margin:0 0 10px"><button class="btn pri" data-a="cadd" data-p="">+ 새 카테고리</button></div>` +
-    `<div class="trow head" style="grid-template-columns:1fr"><span>분류 이름 (+ 하위로 카테고리 안에 카테고리를 만들어요)</span></div>` + (rows || `<p>아직 항목이 없어요.</p>`);
+    `<div class="trow head" style="grid-template-columns:1fr"><span>분류 이름 (▲▼ 로 순서를 바꾸고, + 하위로 카테고리 안에 카테고리를 만들어요)</span></div>` + (rows || `<p>아직 항목이 없어요.</p>`);
 }
 function renderAdmin(){
   $("#adm-menu").innerHTML = MENUS.map(m => `<button class="${m===amenu?"on":""}" data-m="${m}">${m}</button>`).join("");
@@ -1178,6 +1186,10 @@ AM.onclick = e => {
   }
   if(a === "cadd") edit = { mode:"new", p:P() };
   else if(a === "cedit") edit = { mode:"edit", p:P() };
+  else if(a === "cmu" || a === "cmd"){
+    const p = P(), arr = listAt(p.slice(0, -1)), k = p[p.length - 1], j = a === "cmu" ? k - 1 : k + 1;
+    if(j >= 0 && j < arr.length && !(p.length === 1 && arr[j].name === ALL)){ [arr[k], arr[j]] = [arr[j], arr[k]]; persist(); }
+  }
   else if(a === "cdel"){
     const p = P(), names = pathOf(p), full = names.join(SEP);
     if(!confirm(`'${names[names.length-1]}' 카테고리를 삭제할까요?\n하위 카테고리도 함께 삭제돼요.`)) return;
