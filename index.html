@@ -861,7 +861,14 @@ function formView(name){
   if(name === "GitHub 설정"){
     const u = (gh.user||"").trim(), r = (gh.repo||"").trim();
     const site = u && r ? `https://${u}.github.io/${r.toLowerCase() === (u+".github.io").toLowerCase() ? "" : r + "/"}` : "";
-    h += `<h3 style="margin-top:18px">방문자에게 보이게 하기</h3>
+    h += `<h3 style="margin-top:18px">GitHub 토큰 (이미지 자동 업로드 · 바로 올리기)</h3>
+      <p>토큰을 저장하면 올리는 이미지가 저장소의 <code>img</code> 폴더로 바로 올라가요. 토큰은 <b>이 브라우저에만</b> 저장되고, 코드 복사나 사이트 코드에는 들어가지 않아요. 상태: <b>${getTok() ? "저장됨" : "없음"}</b></p>
+      <label>토큰 붙여 넣기<input type="password" id="gh-tok" autocomplete="off" placeholder="github_pat_..."></label>
+      <div class="btns"><button class="btn pri" data-a="tsave">토큰 저장</button><button class="btn" data-a="ttest">연결 테스트</button><button class="btn" data-a="tdel">토큰 삭제</button></div>
+      <p>만드는 법: GitHub → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → 이 저장소만 선택, <b>Contents: Read and write</b> 권한, 만료기간은 짧게. 공용 컴퓨터에서는 쓰지 마세요.</p>
+      <div class="btns"><button class="btn pri" data-a="gpush">GitHub에 바로 올리기</button></div>
+      <p>'바로 올리기'는 지금 수정한 내용(글·설정·이미지 경로)을 저장소 index.html에 직접 반영해요. 코드 복사·붙여넣기를 대신해요.</p>
+    <h3 style="margin-top:18px">방문자에게 보이게 하기</h3>
       <p>관리자 페이지의 수정 내용은 이 브라우저에만 저장돼요. 모두에게 보이려면 아래 순서로 올려 주세요.</p>
       <p>① 코드 복사 → ② GitHub에서 index.html 열기 → ③ <code>const DEFAULT = {...};</code> 부분을 붙여 넣고 Commit</p>
       <div class="btns"><button class="btn pri" data-a="copy">코드 복사</button>
@@ -913,6 +920,10 @@ AM.onclick = e => {
   const b = e.target.closest("[data-a]"); if(!b) return;
   const a = b.dataset.a, i = +b.dataset.i, c = COLL[amenu]; note = "";
   const P = () => b.dataset.p ? b.dataset.p.split(",").map(Number) : [];
+  if(a === "tsave"){ const t = AM.querySelector("#gh-tok").value.trim(); if(t) setTok(t); AM.querySelector(".msg").textContent = t ? "토큰을 이 브라우저에 저장했어요." : "붙여 넣은 토큰이 없어요."; AM.querySelector("#gh-tok").value = ""; return; }
+  if(a === "tdel"){ setTok(""); AM.querySelector(".msg").textContent = "저장된 토큰을 지웠어요."; return; }
+  if(a === "ttest"){ ghTest(AM.querySelector(".msg")); return; }
+  if(a === "gpush"){ if(!ghReady()){ AM.querySelector(".msg").textContent = "계정명·저장소·토큰을 먼저 저장해 주세요."; return; } ghPush(AM.querySelector(".msg")); return; }
   if(a === "pup"){ AM.querySelector("#photo-file").click(); return; }
   if(a === "pdel"){
     profile.photo = ""; saveData(); renderHome();
@@ -1114,18 +1125,70 @@ function fileBox(){
     <div id="fthumbs">${filesHtml()}</div></div>`;
 }
 function readFileData(file){ return new Promise((res, rej) => { const fr = new FileReader(); fr.onload = () => res(fr.result); fr.onerror = rej; fr.readAsDataURL(file); }); }
+
+// ===== GitHub 연동: 토큰은 이 브라우저에만 저장돼요 (코드 복사/사이트 코드에는 절대 들어가지 않아요) =====
+const PREV = {};   // 방금 올린 이미지를 배포 전에도 미리 보이게 하는 임시 보관함 (이 탭에서만)
+document.addEventListener("error", e => {
+  const i = e.target; if(!i || i.tagName !== "IMG") return;
+  const p = i.getAttribute("src"); if(PREV[p] && i.src !== PREV[p]) i.src = PREV[p];
+}, true);
+function getTok(){ try{ return localStorage.getItem("gh-token") || ""; }catch(e){ return ""; } }
+function setTok(t){ try{ if(t) localStorage.setItem("gh-token", t); else localStorage.removeItem("gh-token"); }catch(e){} }
+function ghReady(){ return !!(getTok() && (gh.user||"").trim() && (gh.repo||"").trim()); }
+async function ghApi(method, path, body){
+  const r = await fetch("https://api.github.com/repos/" + gh.user.trim() + "/" + gh.repo.trim() + path, {
+    method, headers:{ "Authorization":"Bearer " + getTok(), "Accept":"application/vnd.github+json", "Content-Type":"application/json" },
+    body: body ? JSON.stringify(body) : undefined });
+  let j = null; try{ j = await r.json(); }catch(e){}
+  if(!r.ok) throw new Error((j && j.message) || ("HTTP " + r.status));
+  return j;
+}
+const b64utf8 = str => btoa(unescape(encodeURIComponent(str)));
+const unb64utf8 = b => decodeURIComponent(escape(atob(b.replace(/\s/g, ""))));
+let ghWarned = false;
+// 이미지: 토큰이 있으면 GitHub의 img 폴더로 올리고 경로(img/…)를 돌려줘요. 없거나 실패하면 예전처럼 브라우저에 저장해요.
+async function storeImage(file, max, q){
+  const data = await readPhoto(file, max, q);
+  if(!ghReady()) return data;
+  try{
+    const path = "img/" + Date.now().toString(36) + Math.random().toString(36).slice(2, 6) + ".jpg";
+    await ghApi("PUT", "/contents/" + path, { message:"Upload " + path, content:data.split(",")[1] });
+    PREV[path] = data; return path;
+  }catch(err){
+    if(!ghWarned){ ghWarned = true; alert("GitHub 업로드에 실패해서 이 브라우저에만 저장했어요.\n(" + err.message + ")\n관리자 > GitHub 설정에서 토큰과 권한을 확인해 주세요."); }
+    return data;
+  }
+}
+async function ghTest(m){
+  m.textContent = "확인 중…";
+  try{
+    const r = await ghApi("GET", "");
+    m.textContent = r.permissions && r.permissions.push ? `연결됐어요! (${r.full_name}, 올리기 권한 있음)` : `저장소는 찾았지만 올리기 권한이 없어요. 토큰의 Contents 권한을 'Read and write'로 해 주세요.`;
+  }catch(err){ m.textContent = "연결 실패: " + err.message; }
+}
+async function ghPush(m){
+  m.textContent = "GitHub에 올리는 중…";
+  try{
+    const f = await ghApi("GET", "/contents/index.html");
+    const src = unb64utf8(f.content), a = src.indexOf("const DEFAULT = "), z = src.indexOf("\n/* =========================================", a);
+    if(a < 0 || z < 0) throw new Error("index.html에서 const DEFAULT 부분을 찾지 못했어요.");
+    const code = "const DEFAULT = " + JSON.stringify({profile,covers,categories,posts,notices,tracks,links,gh,chat,admin:adminCfg}, null, 2) + ";";
+    await ghApi("PUT", "/contents/index.html", { message:"Update site data", content:b64utf8(src.slice(0, a) + code + src.slice(z)), sha:f.sha });
+    m.textContent = "올렸어요! 1~2분 뒤 사이트에 반영돼요.";
+  }catch(err){ m.textContent = "올리기 실패: " + err.message; }
+}
 AM.addEventListener("focusin", e => { if(e.target.id === "body-ta") e.target.dataset.t = "1"; });
 AM.addEventListener("change", async e => {
   if(e.target.id === "cover-file"){
     const f = e.target.files[0]; if(!f || !f.type.startsWith("image/")) return;
-    try{ const src = await readPhoto(f, 1000, .8); AM.querySelector("#cover-val").value = src; AM.querySelector("#cv").innerHTML = `<img src="${src}" alt="">`; }catch(err){ alert("이미지를 불러오지 못했어요."); }
+    try{ const src = await storeImage(f, 1000, .8); AM.querySelector("#cover-val").value = src; AM.querySelector("#cv").innerHTML = `<img src="${src}" alt="">`; }catch(err){ alert("이미지를 불러오지 못했어요."); }
     e.target.value = ""; return;
   }
   if(e.target.id === "post-imgs"){
     const files = [...e.target.files].filter(f => f.type.startsWith("image/"));
     for(const f of files){
       try{
-        const src = await readPhoto(f, 1000, .8), id = edit.images.reduce((m, im) => Math.max(m, +im.id), 0) + 1;
+        const src = await storeImage(f, 1000, .8), id = edit.images.reduce((m, im) => Math.max(m, +im.id), 0) + 1;
         edit.images.push({ id, src });
         const ta = AM.querySelector("#body-ta"); if(ta) insTok(ta, `[[img:${id}]]`, "cur");
       }catch(err){}
@@ -1147,7 +1210,7 @@ AM.addEventListener("change", async e => {
   const f = e.target.files[0], msg = AM.querySelector(".msg"); if(!f) return;
   if(!f.type.startsWith("image/")){ msg.textContent = "이미지 파일만 올릴 수 있어요."; return; }
   try{
-    profile.photo = await readPhoto(f);
+    profile.photo = await storeImage(f, 600, .85);
     const ok = saveData(); renderHome();
     AM.querySelector("#pv").innerHTML = `<img src="${esc(profile.photo)}" alt="프로필">`;
     msg.textContent = ok ? "사진을 바꿨어요." : "저장 공간이 부족해서 이 브라우저에 저장하지 못했어요. 더 작은 사진을 써 보세요.";
