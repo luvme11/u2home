@@ -22,11 +22,12 @@ a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 :focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 
-.window{width:min(900px,100%);height:min(550px,calc(100vh - 48px));min-height:480px;background:var(--win);border-radius:28px;box-shadow:var(--shadow);display:flex;overflow:hidden;transition:background .2s}
+.window{width:min(900px,100%);height:min(660px,calc(100vh - 48px));min-height:560px;background:var(--win);border-radius:28px;box-shadow:var(--shadow);display:flex;overflow:hidden;transition:background .2s}
 .window.wide{width:min(1100px,100%)}
 
 /* sidebar */
-.side{width:192px;flex:none;margin:8px 0 8px 10px;background:var(--side);border:1px solid var(--line);border-radius:20px;padding:14px 14px;overflow-y:auto}
+.side{width:192px;flex:none;margin:8px 0 8px 10px;background:var(--side);border:1px solid var(--line);border-radius:20px;padding:14px 14px;overflow-y:auto;scrollbar-width:none}
+.side::-webkit-scrollbar{display:none}
 .dots{display:flex;gap:6px;margin-bottom:10px}
 .dots i{width:9px;height:9px;border-radius:50%}
 .dots i:nth-child(1){background:#ff5f57}.dots i:nth-child(2){background:#febc2e}.dots i:nth-child(3){background:#28c840}
@@ -1203,7 +1204,7 @@ document.addEventListener("keydown", e => { if(e.key === "Escape") closeAdmin();
 
 // 클릭 소리 (파일 없이 브라우저에서 만들어요). 설정 팝업의 '클릭 소리'에서 고르면 저장돼요.
 (function(){
-  const VOL=0.10;   // 전체 소리 크기 (0~1)
+  const VOL=0.13;   // 전체 소리 크기 (0~1)
   const NAMES={0:"끔",1:"말랑 톡",2:"또각 키보드",3:"물방울 뿅",4:"갈축 타건",5:"나무 블록",6:"노트북 키",7:"타자기",8:"마우스 딸깍",9:"버블 팝",10:"맑은 팅"};
   let snd=1; try{ const v=localStorage.getItem("click-snd"); if(v!==null && NAMES[v]!==undefined) snd=+v; }catch(e){}
   let ac=null, nb=null;
