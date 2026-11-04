@@ -358,36 +358,73 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:.35em;-webki
 /* ====== 여기만 고치면 내용이 바뀝니다 (관리자 페이지의 '코드 복사'로 만든 코드를 통째로 붙여 넣어도 돼요) ====== */
 // img: 이미지 파일 경로 (예: "img/photo1.jpg"). 비워 두면 그라데이션이 표시됩니다.
 const DEFAULT = {
-  profile:{ name:"유니콘 Yunicorn", bio:"나는 지금의 이야기를 하고 있는 거야", tag:"#MyHomepage", blog:"iCloud", photo:"" },
-  covers:{ notice:"공지사항 커버", list:"목록형 커버", gallery:"갤러리형 커버" },
-  // 카테고리: children 안에 또 children을 넣으면 하위 카테고리가 돼요
-  // view: 보이는 방식 (list=목록형, thumb=썸네일, webzine=웹진형, chat=대화형, video=동영상). 비우면 상위 카테고리를 따라가요
-  categories:[
-    { name:"분류 전체보기", children:[] },
-    { name:"목록형", view:"list", children:[ { name:"하위 카테고리", children:[] }, { name:"빈 카테고리", children:[] } ] },
-    { name:"썸네일", view:"thumb", children:[ { name:"갤러리형", children:[] } ] },
-    { name:"웹진형", view:"webzine", children:[] },
-    { name:"대화형", view:"chat", children:[] },
-    { name:"동영상", view:"video", children:[] }
+  "profile": {
+    "name": "U2",
+    "bio": "Ai Chat",
+    "tag": "#극온리/이입 #1T1D",
+    "blog": "iCloud",
+    "photo": "img/mw2axqudmv11.jpg"
+  },
+  "covers": {
+    "notice": "공지사항 커버",
+    "list": "목록형 커버",
+    "gallery": "갤러리형 커버"
+  },
+  "categories": [
+    {
+      "name": "분류 전체보기",
+      "children": []
+    }
   ],
-  posts:[
-    { title:"첫 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 10월 29일", img:"", color:["#6f8fc7","#e9d9b8"] },
-    { title:"두 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#1c1c1c","#a82a2a"] },
-    { title:"세 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#d33a3a","#f4e6d2"] },
-    { title:"네 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#5d7a68","#d8cfa8"] }
+  "posts": [],
+  "notices": [],
+  "tracks": [
+    {
+      "title": "Gorillaz - Feel Good Inc.",
+      "src": "https://youtu.be/-Fp0aTedjwI?si=fscXu4js1DFS1arr"
+    },
+    {
+      "title": "Gwen Stefani - Luxurious",
+      "src": "https://youtu.be/vIhlZKxi8AU?si=pVRruAgikz5NSL0P"
+    },
+    {
+      "title": "Mae Muller - Anticlimax",
+      "src": "https://youtu.be/utN3q6TiooE?si=gDHypQXlFaUJBRI7"
+    },
+    {
+      "title": "Isabel LaRosa - Famous ",
+      "src": "https://youtu.be/PCMdcIr02UE?si=E5HpX8xYyUADWMZ2"
+    },
+    {
+      "title": "Nujabes - Reflection Eternal",
+      "src": "https://youtu.be/GLGM8fxL020?si=XIzpfklOSN6qv7Rh"
+    },
+    {
+      "title": "Nujabes - aruarian dance",
+      "src": "https://youtu.be/qYcoJpqCha4?si=BHO8xisY2iMJkDzz"
+    },
+    {
+      "title": "Childish Gambino - Redbone",
+      "src": "https://youtu.be/CWUxKMF2w2U?si=PVozsL4bj-fPLpKT"
+    }
   ],
-  notices:[
-    { title:"Notice 3 : Image, Text", date:"2026년 10월 29일", img:"", color:["#3f6fb3","#e0a96a"], text:"여기에 공지 내용을 입력하세요. 이미지와 텍스트를 함께 올릴 수 있어요." },
-    { title:"Notice 2 : Text",  date:"2024년 12월 15일", text:"텍스트만 있는 공지 예시입니다." },
-    { title:"Notice 1 : Image", date:"2024년 7월 19일",  img:"", color:["#9bb6d8","#efe7d8"], text:"" }
-  ],
-  tracks:[],   // 예: { title:"곡 제목", src:"https://youtu.be/영상아이디" }  (mp3 경로도 가능)
-  links:[],    // 예: { title:"트위터", url:"https://..." }
-  gh:{ user:"", repo:"" },
-  // 관리자 비밀번호 (관리자 > 홈에서 바꾸고 '코드 복사'로 올리면 모든 기기에 적용돼요)
-  admin:{ pw:"admin1234" },
-  // 대화형 분류의 두 사람 (프로필 이미지는 비우면 기본 아이콘)
-  chat:{ aName:"달", aHandle:"@moontsuki", aPhoto:"", bName:"해파리", bHandle:"@kurage", bPhoto:"" }
+  "links": [],
+  "gh": {
+    "user": "luvme11",
+    "repo": "u2home"
+  },
+  "chat": {
+    "aName": "달",
+    "aHandle": "@moontsuki",
+    "aPhoto": "",
+    "bName": "해파리",
+    "bHandle": "@kurage",
+    "bPhoto": ""
+  },
+  "admin": {
+    "pw": "0220",
+    "vol": 8
+  }
 };
 /* ========================================= */
 
