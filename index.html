@@ -896,7 +896,7 @@ const adm = $("#admin"), AM = $("#adm-main");
 const today = () => { const d = new Date(); return `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일`; };
 const MENUS = ["GitHub 설정","홈","공지","게시글","게시글 카테고리","프로필","대화형 설정","음악","링크"];
 const IMG = ["img","이미지 경로 (예: img/photo.jpg)"];
-let amenu = "게시글", edit = null, note = "";
+let amenu = "게시글", edit = null, note = "", chatKey = "";
 
 // 목록 + 수정 폼이 있는 메뉴
 const COLL = {
@@ -963,7 +963,9 @@ function formView(name){
       <div><input type="file" id="photo-file" accept="image/*" style="display:none">
       <div class="btns" style="margin:0"><button class="btn pri" data-a="pup">사진 업로드</button><button class="btn" data-a="pdel">사진 삭제</button></div>
       <p>사진을 올리면 바로 사이드바에 적용돼요. 정사각형에 가까운 사진이 좋아요.</p></div></div>`;
-  let h = `<h3>${name}</h3>` + photoBlock + f.fields.map(([k,l]) => `<label>${l}<input data-k="${k}" value="${esc(o[k])}"></label>`).join("") +
+  let h = `<h3>${name}</h3>` + photoBlock + f.fields.map(([k,l]) => (name === "대화형 설정" && /Photo$/.test(k))
+      ? `<label>${l}<input data-k="${k}" id="cp-${k}" value="${esc(o[k])}"></label><div class="pphoto" style="margin:4px 0 8px"><div class="pv" id="cpv-${k}" style="width:56px;height:56px;border-radius:50%">${o[k] ? `<img src="${esc(o[k])}" alt="">` : ""}</div><div class="btns" style="margin:0"><button class="btn pri" data-a="chup" data-who="${k}">파일 업로드</button><button class="btn" data-a="chdel" data-who="${k}">삭제</button></div></div>`
+      : `<label>${l}<input data-k="${k}" value="${esc(o[k])}"></label>`).join("") + (name === "대화형 설정" ? `<input type="file" id="chat-file" accept="image/*" style="display:none">` : "") +
     `<div class="btns"><button class="btn pri" data-a="fsave">저장</button></div>`;
   if(name === "GitHub 설정"){
     const u = (gh.user||"").trim(), r = (gh.repo||"").trim();
@@ -1032,6 +1034,11 @@ AM.onclick = e => {
   if(a === "tdel"){ setTok(""); AM.querySelector(".msg").textContent = "저장된 토큰을 지웠어요."; return; }
   if(a === "ttest"){ ghTest(AM.querySelector(".msg")); return; }
   if(a === "gpush"){ if(!ghReady()){ AM.querySelector(".msg").textContent = "계정명·저장소·토큰을 먼저 저장해 주세요."; return; } ghPush(AM.querySelector(".msg")); return; }
+  if(a === "chup"){ chatKey = b.dataset.who; AM.querySelector("#chat-file").click(); return; }
+  if(a === "chdel"){
+    const k = b.dataset.who; chat[k] = ""; AM.querySelector("#cp-" + k).value = ""; AM.querySelector("#cpv-" + k).innerHTML = "";
+    persist(); AM.querySelector(".msg").textContent = "이미지를 삭제했어요."; return;
+  }
   if(a === "pup"){ AM.querySelector("#photo-file").click(); return; }
   if(a === "pdel"){
     profile.photo = ""; saveData(); renderHome();
@@ -1305,6 +1312,17 @@ function autoPush(){
 }
 AM.addEventListener("focusin", e => { if(e.target.id === "body-ta") e.target.dataset.t = "1"; });
 AM.addEventListener("change", async e => {
+  if(e.target.id === "chat-file"){
+    const f = e.target.files[0], k = chatKey, msg = AM.querySelector(".msg"); e.target.value = "";
+    if(!f || !k) return;
+    if(!f.type.startsWith("image/")){ msg.textContent = "이미지 파일만 올릴 수 있어요."; return; }
+    try{
+      const src = await storeImage(f, 240, .85);
+      chat[k] = src; AM.querySelector("#cp-" + k).value = src; AM.querySelector("#cpv-" + k).innerHTML = `<img src="${esc(src)}" alt="">`;
+      persist(); msg.textContent = "이미지를 바꿨어요.";
+    }catch(err){ msg.textContent = "이미지를 불러오지 못했어요."; }
+    return;
+  }
   if(e.target.id === "cover-file"){
     const f = e.target.files[0]; if(!f || !f.type.startsWith("image/")) return;
     try{ const src = await storeImage(f, 1000, .8); AM.querySelector("#cover-val").value = src; AM.querySelector("#cv").innerHTML = `<img src="${src}" alt="">`; }catch(err){ alert("이미지를 불러오지 못했어요."); }
