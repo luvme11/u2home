@@ -17,6 +17,7 @@
 }
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%}
+html{background:var(--page,var(--bg))}
 body{background:var(--page,var(--bg));color:var(--text);font:12.5px/1.6 Pretendard,"Apple SD Gothic Neo","Malgun Gothic",system-ui,sans-serif;display:flex;align-items:center;justify-content:center;padding:24px;transition:background .2s}
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
@@ -291,13 +292,6 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:0;-webkit-bo
 .window[data-mode] #btn-mode .pt{background:var(--mc)}
 .window[data-mode] .tagline{color:var(--mc)}   /* 프로필 아래 태그도 같은 색 */
 .window[data-mode] .nlist b,.window[data-mode] .nlist a:hover b{color:var(--mc)}   /* 메인 화면: 제목 글자색만 바뀌고 상자는 없음 */
-/* mode: 창 뒤의 바탕 화면도 mode 색과 같은 색으로 바뀌어요 (회색 기본은 원래 연회색 그대로) */
-:root[data-mode=rose]{--page:#dd8f84}
-:root[data-mode=green]{--page:#3f7a58}
-:root[data-mode=blue]{--page:#7ba6d9}
-:root[data-theme="dark"][data-mode=rose]{--page:#e8a398}
-:root[data-theme="dark"][data-mode=green]{--page:#6fae88}
-:root[data-theme="dark"][data-mode=blue]{--page:#8db6ea}
 /* 이전 글 / 다음 글 (wide일 때만 보여요) */
 .pn{display:none;gap:10px;flex-wrap:wrap;margin:20px 0 8px}
 .window.wide .pn{display:none}
@@ -785,6 +779,9 @@ addEventListener("hashchange", route); route();
     win.classList.toggle("onlist", inList);
     bw.classList.toggle("hidden", !inList);
     win.dataset.mode = mode; document.documentElement.dataset.mode = mode;
+    // 창 뒤 바탕: 라이트 모드에서만 mode 색과 같게 (회색 기본·다크 모드는 원래 바탕 그대로)
+    const PAGE = { blue:"#7ba6d9", rose:"#dd8f84", green:"#3f7a58" }, dk = document.documentElement.dataset.theme === "dark";
+    if(PAGE[mode] && !dk) document.documentElement.style.setProperty("--page", PAGE[mode]); else document.documentElement.style.removeProperty("--page");
     bw.textContent = (wide && inList) ? "list" : "wide";   // 넓게 보는 중이면 list, 아니면 wide
     bw.classList.toggle("on", wide && inList);
     document.getElementById("btn-notice").classList.toggle("on", /^#notice/.test(location.hash));   // notice 화면이면 강조   // 글자는 항상 wide, 켜져 있으면 테두리만 강조
@@ -919,6 +916,7 @@ const root = document.documentElement;
 function setDark(on){
   if(on) root.dataset.theme = "dark"; else delete root.dataset.theme;
   $("#s-dark").setAttribute("aria-checked", on);
+  if(window.applyView) window.applyView();
   try{ localStorage.setItem("theme", on ? "dark" : "light"); }catch(e){}
 }
 let saved = null; try{ saved = localStorage.getItem("theme"); }catch(e){}
