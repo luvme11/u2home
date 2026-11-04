@@ -730,6 +730,7 @@ addEventListener("hashchange", route); route();
     win.classList.toggle("wide", wide && inList);
     bw.classList.toggle("hidden", !inList);
     win.dataset.mode = mode;
+    bw.textContent = (wide && inList) ? "list" : "wide";   // 넓게 보는 중이면 list, 아니면 wide
     bw.classList.toggle("on", wide && inList);
     document.getElementById("btn-notice").classList.toggle("on", /^#notice/.test(location.hash));   // notice 화면이면 강조   // 글자는 항상 wide, 켜져 있으면 테두리만 강조
     bw.setAttribute("aria-pressed", String(wide));
