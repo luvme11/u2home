@@ -280,7 +280,6 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:.35em;-webki
 .window[data-mode] #btn-mode .pt{background:var(--mc)}
 .window[data-mode] .tagline{color:var(--mc)}   /* 프로필 아래 태그도 같은 색 */
 .window[data-mode] .memo-list .memo-head b,.window[data-mode] .memo-list .memo-items b,.window[data-mode] .memo-list .wz .wzt b{color:var(--mc)}   /* 글 목록: 선택 여부와 상관없이 모든 제목이 mode 색 */
-.window[data-mode] .memo-items a.on,.window[data-mode] .memo-items button.on{background:color-mix(in srgb,var(--mc) 10%,transparent)}
 .window[data-mode] .nlist b,.window[data-mode] .nlist a:hover b{color:var(--mc)}   /* 메인 화면: 제목 글자색만 바뀌고 상자는 없음 */
 /* 이전 글 / 다음 글 (wide일 때만 보여요) */
 .pn{display:none;gap:10px;flex-wrap:wrap;margin:20px 0 8px}
@@ -325,6 +324,7 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:.35em;-webki
       <div class="bar-l">
         <button class="chip" id="btn-wide" aria-pressed="false">wide</button>
         <button class="chip" id="btn-mode" aria-pressed="false"><i class="pt"></i>mode</button>
+        <a class="chip" id="btn-notice" href="#notice">notice</a>
       </div>
       <button class="icon-btn" id="btn-music" aria-label="음악" aria-expanded="false" aria-controls="pop-music">
         <svg viewBox="0 0 16 16"><path d="M6 12.5V3.5l7-1.5v9"/><circle cx="4.5" cy="12.5" r="1.7"/><circle cx="11.5" cy="11" r="1.7"/></svg>
@@ -732,7 +732,8 @@ addEventListener("hashchange", route); route();
     win.classList.toggle("wide", wide && inList);
     bw.classList.toggle("hidden", !inList);
     win.dataset.mode = mode;
-    bw.textContent = wide ? "list" : "wide";
+    bw.classList.toggle("on", wide && inList);
+    document.getElementById("btn-notice").classList.toggle("on", /^#notice/.test(location.hash));   // notice 화면이면 강조   // 글자는 항상 wide, 켜져 있으면 테두리만 강조
     bw.setAttribute("aria-pressed", String(wide));
     bm.setAttribute("aria-label", "mode: " + MN[mode]);
   }
