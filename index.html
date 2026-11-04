@@ -276,10 +276,9 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:.35em;-webki
 :root[data-theme="dark"] .window[data-mode=green]{--mc:#6fae88}
 :root[data-theme="dark"] .window[data-mode=blue]{--mc:#8db6ea}
 :root[data-theme="dark"] .window[data-mode=gray]{--mc:#a3a5ab}
-.window[data-mode] .memo-list{--accent:var(--mc);background:color-mix(in srgb,var(--mc) 12%,var(--win))}
+.window[data-mode] .memo-list{--accent:var(--mc)}   /* 글 목록: 배경은 그대로, 선택된 제목·페이지 숫자만 mode 색 */
 .window[data-mode] #btn-mode .pt{background:var(--mc)}
 .window[data-mode] .tagline{color:var(--mc)}   /* 프로필 아래 태그도 같은 색 */
-.window[data-mode] .memo-list .memo-head b,.window[data-mode] .memo-list .memo-items b,.window[data-mode] .memo-list .wz .wzt b{color:var(--mc)}   /* 글 목록: 선택 여부와 상관없이 모든 제목이 mode 색 */
 .window[data-mode] .nlist b,.window[data-mode] .nlist a:hover b{color:var(--mc)}   /* 메인 화면: 제목 글자색만 바뀌고 상자는 없음 */
 /* 이전 글 / 다음 글 (wide일 때만 보여요) */
 .pn{display:none;gap:10px;flex-wrap:wrap;margin:20px 0 8px}
