@@ -866,8 +866,9 @@ function formView(name){
       <label>토큰 붙여 넣기<input type="password" id="gh-tok" autocomplete="off" placeholder="github_pat_..."></label>
       <div class="btns"><button class="btn pri" data-a="tsave">토큰 저장</button><button class="btn" data-a="ttest">연결 테스트</button><button class="btn" data-a="tdel">토큰 삭제</button></div>
       <p>만드는 법: GitHub → Settings → Developer settings → Personal access tokens → <b>Fine-grained tokens</b> → 이 저장소만 선택, <b>Contents: Read and write</b> 권한, 만료기간은 짧게. 공용 컴퓨터에서는 쓰지 마세요.</p>
+      <label style="display:flex;align-items:center;gap:6px;margin-top:10px"><input type="checkbox" id="gh-auto" style="width:auto;margin:0" ${autoOn() ? "checked" : ""}>저장할 때마다 자동으로 GitHub에 올리기</label>
       <div class="btns"><button class="btn pri" data-a="gpush">GitHub에 바로 올리기</button></div>
-      <p>'바로 올리기'는 지금 수정한 내용(글·설정·이미지 경로)을 저장소 index.html에 직접 반영해요. 코드 복사·붙여넣기를 대신해요.</p>
+      <p>자동 올리기를 끄면 위 버튼으로 직접 올릴 수 있어요. '바로 올리기'는 지금 수정한 내용(글·설정·이미지 경로)을 저장소 index.html에 직접 반영해요. 코드 복사·붙여넣기를 대신해요.</p>
     <h3 style="margin-top:18px">방문자에게 보이게 하기</h3>
       <p>관리자 페이지의 수정 내용은 이 브라우저에만 저장돼요. 모두에게 보이려면 아래 순서로 올려 주세요.</p>
       <p>① 코드 복사 → ② GitHub에서 index.html 열기 → ③ <code>const DEFAULT = {...};</code> 부분을 붙여 넣고 Commit</p>
@@ -912,7 +913,7 @@ function renderAdmin(){
 }
 function persist(){
   if(!saveData()) alert("저장 공간이 부족해서 이 브라우저에 저장하지 못했어요. 이미지 수를 줄여 주세요.");
-  renderHome(); renderNotice(); route();
+  renderHome(); renderNotice(); route(); autoPush();
   if(amenu === "음악"){ if(ti >= tracks.length) ti = 0; loadTrack(); }
 }
 $("#adm-menu").onclick = e => { const b = e.target.closest("button"); if(!b) return; amenu = b.dataset.m; edit = null; note = ""; renderAdmin(); };
@@ -1177,6 +1178,24 @@ async function ghPush(m){
     m.textContent = "올렸어요! 1~2분 뒤 사이트에 반영돼요.";
   }catch(err){ m.textContent = "올리기 실패: " + err.message; }
 }
+// 자동 올리기: 저장할 때마다 잠깐 기다렸다가(2초) GitHub에 반영해요. 설정에서 끌 수 있어요.
+function autoOn(){ try{ return localStorage.getItem("gh-auto") !== "0"; }catch(e){ return true; } }
+let toastEl = null, toastT = null;
+function toast(t){
+  if(!toastEl){ toastEl = document.createElement("div"); toastEl.style.cssText = "position:fixed;left:50%;bottom:22px;transform:translateX(-50%);z-index:50;background:var(--win);color:var(--strong);border:1px solid var(--line);border-radius:99px;padding:6px 16px;font-size:11px;box-shadow:var(--shadow)"; document.body.appendChild(toastEl); }
+  toastEl.textContent = t; toastEl.style.display = "block"; clearTimeout(toastT); toastT = setTimeout(() => toastEl.style.display = "none", 3500);
+}
+let apT = null, apBusy = false, apAgain = false;
+function autoPush(){
+  if(!ghReady() || !autoOn()) return;
+  clearTimeout(apT); apT = setTimeout(async () => {
+    if(apBusy){ apAgain = true; return; }
+    apBusy = true; const m = { textContent:"" };
+    toast("GitHub에 올리는 중…"); await ghPush(m);
+    toast(m.textContent.startsWith("올렸어요") ? "GitHub에 올렸어요 (1~2분 뒤 사이트에 반영)" : m.textContent);
+    apBusy = false; if(apAgain){ apAgain = false; autoPush(); }
+  }, 2000);
+}
 AM.addEventListener("focusin", e => { if(e.target.id === "body-ta") e.target.dataset.t = "1"; });
 AM.addEventListener("change", async e => {
   if(e.target.id === "cover-file"){
@@ -1211,7 +1230,7 @@ AM.addEventListener("change", async e => {
   if(!f.type.startsWith("image/")){ msg.textContent = "이미지 파일만 올릴 수 있어요."; return; }
   try{
     profile.photo = await storeImage(f, 600, .85);
-    const ok = saveData(); renderHome();
+    const ok = saveData(); renderHome(); autoPush();
     AM.querySelector("#pv").innerHTML = `<img src="${esc(profile.photo)}" alt="프로필">`;
     msg.textContent = ok ? "사진을 바꿨어요." : "저장 공간이 부족해서 이 브라우저에 저장하지 못했어요. 더 작은 사진을 써 보세요.";
   }catch(err){ msg.textContent = "사진을 불러오지 못했어요."; }
@@ -1257,6 +1276,7 @@ $("#list").addEventListener("click", e => {
     posts.splice(+b.dataset.i, 1); persist(); location.hash = "#c/" + encodeURIComponent(LS.cat || "");
   }
 });
+AM.addEventListener("change", e => { if(e.target.id === "gh-auto"){ try{ localStorage.setItem("gh-auto", e.target.checked ? "1" : "0"); }catch(err){} } });
 AM.addEventListener("change", e => { if(e.target.id === "post-filter"){ pf = e.target.value; renderAdmin(); } });
 $("#s-admin").onclick = e => { e.stopPropagation(); openAdmin(); };
 $("#a-close").onclick = closeAdmin;
