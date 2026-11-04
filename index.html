@@ -262,6 +262,14 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:0;-webkit-bo
 /* 상단 wide / mode 버튼 */
 .bar-l{display:flex;gap:6px;margin-right:auto}
 .bar-l .chip{line-height:1.7}
+/* 글 목록 화면: 글 목록 칸이 창 맨 위~맨 아래까지 닿고, 상단 버튼(wide/mode/notice)은 글 목록 오른쪽(본문 위)에 놓여요. wide일 땐 왼쪽 끝으로 가요 */
+@media (min-width:721px){
+  .window.onlist .main{position:relative}
+  .window.onlist .bar{position:absolute;top:0;left:0;right:0;z-index:3;padding-left:calc(230px + 14px);pointer-events:none}
+  .window.onlist .bar>*{pointer-events:auto}
+  .window.onlist.wide .bar{padding-left:14px}
+  .window.onlist .memo-body{margin-top:40px;padding-top:6px}
+}
 /* 글 목록 배경이 창 맨 아래까지 닿도록 */
 @media (min-width:721px){.memo{height:calc(100% + 28px)}}
 /* wide: 글 목록을 접고 본문을 넓게 */
@@ -728,6 +736,7 @@ addEventListener("hashchange", route); route();
   function apply(){
     const inList = document.getElementById("home").classList.contains("hidden");
     win.classList.toggle("wide", wide && inList);
+    win.classList.toggle("onlist", inList);
     bw.classList.toggle("hidden", !inList);
     win.dataset.mode = mode;
     bw.textContent = (wide && inList) ? "list" : "wide";   // 넓게 보는 중이면 list, 아니면 wide
