@@ -421,356 +421,36 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:0;-webkit-bo
 /* ====== 여기만 고치면 내용이 바뀝니다 (관리자 페이지의 '코드 복사'로 만든 코드를 통째로 붙여 넣어도 돼요) ====== */
 // img: 이미지 파일 경로 (예: "img/photo1.jpg"). 비워 두면 그라데이션이 표시됩니다.
 const DEFAULT = {
-  "profile": {
-    "name": "U2",
-    "bio": "Ai Chat",
-    "tag": "#극온리/이입 #1T1D",
-    "blog": "iCloud",
-    "photo": "img/mw2axqudmv11.jpg"
-  },
-  "covers": {
-    "notice": "NOTICE",
-    "list": "목록형 커버",
-    "gallery": "갤러리형 커버"
-  },
-  "categories": [
-    {
-      "name": "분류 전체보기",
-      "children": []
-    },
-    {
-      "name": "LOG",
-      "children": [
-        {
-          "name": "7",
-          "children": []
-        },
-        {
-          "name": "임찬희",
-          "children": []
-        },
-        {
-          "name": "류보민",
-          "children": []
-        }
-      ],
-      "view": "list"
-    },
-    {
-      "name": "ASSET",
-      "children": [
-        {
-          "name": "7",
-          "children": []
-        },
-        {
-          "name": "임찬희",
-          "children": []
-        },
-        {
-          "name": "류보민",
-          "children": []
-        }
-      ],
-      "view": "thumb"
-    },
-    {
-      "name": "MEMO",
-      "children": [],
-      "view": "webzine"
-    },
-    {
-      "name": "♡",
-      "children": [],
-      "view": "webzine"
-    }
+  profile:{ name:"유니콘 Yunicorn", bio:"나는 지금의 이야기를 하고 있는 거야", tag:"#MyHomepage", blog:"iCloud", photo:"" },
+  covers:{ notice:"공지사항 커버", list:"목록형 커버", gallery:"갤러리형 커버" },
+  // 카테고리: children 안에 또 children을 넣으면 하위 카테고리가 돼요
+  // view: 보이는 방식 (list=목록형, thumb=썸네일, webzine=웹진형, chat=대화형, video=동영상). 비우면 상위 카테고리를 따라가요
+  categories:[
+    { name:"분류 전체보기", children:[] },
+    { name:"목록형", view:"list", children:[ { name:"하위 카테고리", children:[] }, { name:"빈 카테고리", children:[] } ] },
+    { name:"썸네일", view:"thumb", children:[ { name:"갤러리형", children:[] } ] },
+    { name:"웹진형", view:"webzine", children:[] },
+    { name:"대화형", view:"chat", children:[] },
+    { name:"동영상", view:"video", children:[] }
   ],
-  "posts": [
-    {
-      "title": "Aftermess 하단 Q&A HTML",
-      "type": "♡",
-      "side": "",
-      "date": "2026년 11월 5일",
-      "pw": "",
-      "text": ":::center\n[[file:1]]\n:::\n\n<!doctype html>\n<html lang=\"ko\"><head>\n<meta charset=\"utf-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\n<title>Q&amp;A</title>\n<link rel=\"stylesheet\" href=\"https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css\">\n<style>\n  :root {\n    --bg: #0b0b0b;\n    --line: #2b2b2b;\n    --text: #f2f2f2;\n    --muted: #8a8a8a;\n    --red: #d42b2b;\n  }\n  * { box-sizing: border-box; margin: 0; padding: 0; }\n  body {\n    background: #050505;\n    color: var(--text);\n    font-family: 'Pretendard', -apple-system, 'Noto Sans KR', sans-serif;\n    min-height: 100vh;\n    display: flex;\n    justify-content: center;\n    align-items: flex-start;\n    padding: 0 0 96px;\n  }\n  .card { width: 590px; max-width: 100%; background: var(--bg); padding: 14px 14px 14px; }\n  .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; letter-spacing: .08em; }\n\n  /* 섹션 제목 */\n  .sec { display: flex; align-items: center; gap: 8px; height: 14px; font-size: 11px; margin: 0 0 8px; }\n  .sec b { font-weight: 700; letter-spacing: .1em; }\n  .sec span { color: var(--muted); font-size: 10px; }\n  .sec::after { content: ''; flex: 1; height: 1px; background: var(--line); }\n\n  .box { border: 1px solid var(--line); }\n\n  /* Q&A */\n  .qa { padding: 10px 13px 14px; }\n  .qa + .qa { border-top: 1px dashed #3a3a3a; padding: 14px 13px 12px; }\n  .qa-wrap { display: flex; gap: 11px; }\n  .badge { width: 20px; height: 20px; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 800; }\n  .badge.q { background: var(--red); color: #fff; }\n  .badge.a { border: 1px solid #bbb; color: #fff; }\n  .qa .who { font-size: 10px; line-height: 12px; color: var(--muted); margin-bottom: 7px; }\n  .qa .txt { font-size: 14px; line-height: 18px; }\n  .qa.q .txt { font-weight: 700; }\n\n  /* 수정 모드 */\n  body.editing [contenteditable] { outline: 1px dashed rgba(212, 43, 43, .55); outline-offset: 3px; cursor: text; }\n  body.editing [contenteditable]:focus { outline: 1px solid var(--red); background: rgba(212, 43, 43, .08); }\n\n  /* 하단 도구 막대 */\n  .toolbar {\n    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);\n    display: flex; gap: 8px; padding: 8px; background: #151515; border: 1px solid #333;\n    z-index: 10; font-family: 'Pretendard', sans-serif;\n  }\n  .tbtn {\n    background: #0b0b0b; color: var(--text); border: 1px solid #555; padding: 9px 14px;\n    font: 600 13px 'Pretendard', sans-serif; cursor: pointer; white-space: nowrap;\n  }\n  .tbtn:hover { border-color: #fff; }\n  .tbtn.on { background: var(--red); border-color: var(--red); }\n\n  /* HTML 코드 창 */\n  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 20; }\n  .modal.open { display: flex; }\n  .panel { width: 100%; max-width: 760px; max-height: 90vh; background: #121212; border: 1px solid #444; padding: 16px; display: flex; flex-direction: column; gap: 12px; }\n  .panel h2 { font-size: 14px; }\n  .panel p { font-size: 12px; color: var(--muted); }\n  .panel textarea {\n    flex: 1; min-height: 300px; resize: none; background: #060606; color: #d6d6d6;\n    border: 1px solid #333; padding: 12px; font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;\n  }\n  .panel .btns { display: flex; gap: 8px; flex-wrap: wrap; }\n</style>\n</head>\n<body>\n  <main class=\"card\" id=\"card\">\n    <div class=\"sec\"><b class=\"mono\">↘ Q&amp;A</b><span>랜덤 Q&amp;A</span></div>\n    <div class=\"box\">\n      <div class=\"qa q\">\n        <div class=\"qa-wrap\">\n          <div class=\"badge q\">Q</div>\n          <div>\n            <div class=\"who mono\">RANDOM</div>\n            <div class=\"txt\">방금 22가 웃었을 때 잠깐 멈칫한 것 같은데 기분 탓인가?</div>\n          </div>\n        </div>\n      </div>\n      <div class=\"qa\">\n        <div class=\"qa-wrap\">\n          <div class=\"badge a\">A</div>\n          <div>\n            <div class=\"who mono\">7</div>\n            <div class=\"txt\">Shut up. The neon light just got in my eyes for a second.(닥쳐. 그냥 네온사인 불빛이 잠깐 눈에 들어온 것뿐이야.)</div>\n          </div>\n        </div>\n      </div>\n    </div>\n  </main>\n\n  <div id=\"editor-ui\"></div>\n\n<script>\n  /* 도구 막대/코드 창은 여기서 만들어요 (내보내는 코드에는 들어가지 않음) */\n  const ui = document.getElementById('editor-ui');\n  ui.innerHTML = '';\n  function el(tag, props, kids) {\n    const e = document.createElement(tag);\n    Object.keys(props || {}).forEach(k => { if (k === 'text') e.textContent = props[k]; else e.setAttribute(k, props[k]); });\n    (kids || []).forEach(c => e.appendChild(c));\n    return e;\n  }\n  ui.appendChild(el('div', { class: 'toolbar', id: 'toolbar' }, [\n    el('button', { class: 'tbtn', id: 'editBtn', type: 'button', text: '✎ 수정 모드' }),\n    el('button', { class: 'tbtn', id: 'codeBtn', type: 'button', text: 'HTML 코드 받기' })\n  ]));\n  const ta = el('textarea', { id: 'codeBox', spellcheck: 'false' });\n  ta.readOnly = true;\n  ui.appendChild(el('div', { class: 'modal', id: 'modal' }, [\n    el('div', { class: 'panel' }, [\n      el('h2', { text: '수정한 내용이 반영된 HTML 코드' }),\n      el('p', { text: '복사해서 .html 파일로 저장하면 지금 화면 그대로 열려요. 그 파일에서도 또 수정할 수 있어요.' }),\n      ta,\n      el('div', { class: 'btns' }, [\n        el('button', { class: 'tbtn on', id: 'copyBtn', type: 'button', text: '코드 복사' }),\n        el('button', { class: 'tbtn', id: 'dlBtn', type: 'button', text: '.html 다운로드' }),\n        el('button', { class: 'tbtn', id: 'closeBtn', type: 'button', text: '닫기' })\n      ])\n    ])\n  ]));\n\n  const editBtn = document.getElementById('editBtn');\n  const codeBtn = document.getElementById('codeBtn');\n  const modal = document.getElementById('modal');\n  const codeBox = document.getElementById('codeBox');\n  const copyBtn = document.getElementById('copyBtn');\n  const dlBtn = document.getElementById('dlBtn');\n  const closeBtn = document.getElementById('closeBtn');\n\n  const EDIT_SEL = '.txt,.who,.badge,.sec b,.sec span';\n\n  /* ---- 수정 모드 ---- */\n  function setEditing(on) {\n    document.body.classList.toggle('editing', on);\n    document.querySelectorAll(EDIT_SEL).forEach(el => {\n      if (on) el.setAttribute('contenteditable', 'true');\n      else el.removeAttribute('contenteditable');\n    });\n    editBtn.textContent = on ? '✔ 수정 끝내기' : '✎ 수정 모드';\n    editBtn.classList.toggle('on', on);\n  }\n  editBtn.addEventListener('click', () => setEditing(!document.body.classList.contains('editing')));\n\n  // 붙여넣기는 글자만, Enter는 입력 종료, Shift+Enter로 줄바꿈\n  document.addEventListener('paste', e => {\n    const t = e.target.closest && e.target.closest('[contenteditable]');\n    if (!t) return;\n    e.preventDefault();\n    const text = (e.clipboardData || window.clipboardData).getData('text/plain');\n    document.execCommand('insertText', false, text);\n  });\n  document.addEventListener('keydown', e => {\n    const t = e.target.closest && e.target.closest('[contenteditable]');\n    if (t && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); t.blur(); }\n  });\n\n  /* ---- HTML 코드 만들기 ---- */\n  function buildHTML() {\n    const clone = document.documentElement.cloneNode(true);\n    clone.querySelector('body').classList.remove('editing');\n    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));\n    clone.querySelector('#editor-ui').innerHTML = '';\n    return '<!doctype html>\\n' + clone.outerHTML;\n  }\n\n  function openModal() {\n    codeBox.value = buildHTML();\n    copyBtn.textContent = '코드 복사';\n    modal.classList.add('open');\n    codeBox.focus();\n    codeBox.select();\n  }\n  function closeModal() { modal.classList.remove('open'); }\n\n  codeBtn.addEventListener('click', openModal);\n  closeBtn.addEventListener('click', closeModal);\n  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });\n\n  copyBtn.addEventListener('click', async () => {\n    const text = codeBox.value;\n    try {\n      await navigator.clipboard.writeText(text);\n    } catch (e) {\n      codeBox.select();\n      document.execCommand('copy');\n    }\n    copyBtn.textContent = '복사 완료 ✔';\n    setTimeout(() => { copyBtn.textContent = '코드 복사'; }, 1800);\n  });\n\n  dlBtn.addEventListener('click', () => {\n    const blob = new Blob([codeBox.value], { type: 'text/html;charset=utf-8' });\n    const a = document.createElement('a');\n    a.href = URL.createObjectURL(blob);\n    a.download = 'episode5_qa.html';\n    document.body.appendChild(a);\n    a.click();\n    a.remove();\n    setTimeout(() => URL.revokeObjectURL(a.href), 1000);\n  });\n</script>\n\n\n</body></html>",
-      "img": "",
-      "color": [
-        "#7a93c9",
-        "#eadfc8"
-      ],
-      "images": [],
-      "files": [
-        {
-          "id": 1,
-          "name": "episode5_qa.html",
-          "size": 8853,
-          "src": "files/mw2nv006vt4b-episode5_qa.html",
-          "path": true
-        }
-      ]
-    },
-    {
-      "title": "윳! 발췌기 프리셋 OOC",
-      "type": "♡",
-      "side": "",
-      "date": "2026년 11월 5일",
-      "pw": "",
-      "text": ":::center\n[[file:1]]\n:::\n[[img:1]]",
-      "img": "",
-      "color": [
-        "#7a93c9",
-        "#eadfc8"
-      ],
-      "images": [
-        {
-          "id": 1,
-          "src": "img/mw2nqjqbpo2a.jpg"
-        }
-      ],
-      "files": [
-        {
-          "id": 1,
-          "name": "[윳!발췌기]_7 OOC.json",
-          "size": 2711415,
-          "src": "files/mw2nqnxinf7d-_윳_발췌기__7_OOC.json",
-          "path": true
-        }
-      ]
-    },
-    {
-      "title": "윳! 발췌기 프리셋 ",
-      "type": "♡",
-      "side": "",
-      "date": "2026년 11월 5일",
-      "pw": "",
-      "text": ":::center\n[[file:1]]\n:::\n[[img:1]]",
-      "img": "",
-      "color": [
-        "#7a93c9",
-        "#eadfc8"
-      ],
-      "images": [
-        {
-          "id": 1,
-          "src": "img/mw2npgzbo8z4.jpg"
-        }
-      ],
-      "files": [
-        {
-          "id": 1,
-          "name": "[윳!발췌기]_7 (1).json",
-          "size": 2697411,
-          "src": "files/mw2nptiaavss-_윳_발췌기__7__1_.json",
-          "path": true
-        }
-      ]
-    },
-    {
-      "title": "임찬희 비공식",
-      "type": "ASSET > 임찬희",
-      "side": "",
-      "date": "2026년 11월 5일",
-      "pw": "0220",
-      "text": "[[img:1]]\n\n[[img:2]]\n\n[[img:3]]\n\n[[img:4]]\n\n[[img:5]]\n\n[[img:6]]\n\n[[img:7]]\n\n[[img:8]]\n\n[[img:9]]\n\n[[img:10]]\n\n[[img:11]]\n\n[[img:12]]\n\n[[img:13]]\n\n[[img:14]]\n\n[[img:15]]\n\n[[img:16]]\n\n[[img:17]]\n\n[[img:18]]\n\n[[img:19]]\n\n[[img:20]]\n\n[[img:21]]\n\n[[img:22]]\n\n[[img:23]]\n\n[[img:24]]\n\n[[img:25]]\n\n[[img:27]]\n\n[[img:28]]\n\n[[img:29]]\n\n[[img:30]]\n\n[[img:31]]\n\n[[img:32]]",
-      "img": "",
-      "color": [
-        "#7a93c9",
-        "#eadfc8"
-      ],
-      "images": [
-        {
-          "id": 1,
-          "src": "img/mw2ld55crxua.jpg"
-        },
-        {
-          "id": 2,
-          "src": "img/mw2ld70ccu0q.jpg"
-        },
-        {
-          "id": 3,
-          "src": "img/mw2ld8fluzht.jpg"
-        },
-        {
-          "id": 4,
-          "src": "img/mw2lda3f4sxb.jpg"
-        },
-        {
-          "id": 5,
-          "src": "img/mw2ldboo3qi7.jpg"
-        },
-        {
-          "id": 6,
-          "src": "img/mw2lddadln1y.jpg"
-        },
-        {
-          "id": 7,
-          "src": "img/mw2lderzxkdz.jpg"
-        },
-        {
-          "id": 8,
-          "src": "img/mw2ldgj87prx.jpg"
-        },
-        {
-          "id": 9,
-          "src": "img/mw2ldhyl2s76.jpg"
-        },
-        {
-          "id": 10,
-          "src": "img/mw2ldjro5618.jpg"
-        },
-        {
-          "id": 11,
-          "src": "img/mw2ldlhxroof.jpg"
-        },
-        {
-          "id": 12,
-          "src": "img/mw2ldmsoxuvy.jpg"
-        },
-        {
-          "id": 13,
-          "src": "img/mw2ldoke3vab.jpg"
-        },
-        {
-          "id": 14,
-          "src": "img/mw2ldq9qozml.jpg"
-        },
-        {
-          "id": 15,
-          "src": "img/mw2ldrz7bvnb.jpg"
-        },
-        {
-          "id": 16,
-          "src": "img/mw2ldtrex8u6.jpg"
-        },
-        {
-          "id": 17,
-          "src": "img/mw2ldvdynzp5.jpg"
-        },
-        {
-          "id": 18,
-          "src": "img/mw2ldx0adm09.jpg"
-        },
-        {
-          "id": 19,
-          "src": "img/mw2ldy9ehnxo.jpg"
-        },
-        {
-          "id": 20,
-          "src": "img/mw2ldzjwrkhd.jpg"
-        },
-        {
-          "id": 21,
-          "src": "img/mw2le0ve634o.jpg"
-        },
-        {
-          "id": 22,
-          "src": "img/mw2le2oqlrh9.jpg"
-        },
-        {
-          "id": 23,
-          "src": "img/mw2le40231tt.jpg"
-        },
-        {
-          "id": 24,
-          "src": "img/mw2le5bdh5ui.jpg"
-        },
-        {
-          "id": 25,
-          "src": "img/mw2le6qh7klf.jpg"
-        },
-        {
-          "id": 27,
-          "src": "img/mw2le9q1itxp.jpg"
-        },
-        {
-          "id": 28,
-          "src": "img/mw2leb6nafgi.jpg"
-        },
-        {
-          "id": 29,
-          "src": "img/mw2leci9dznu.jpg"
-        },
-        {
-          "id": 30,
-          "src": "img/mw2lee4x6v8f.jpg"
-        },
-        {
-          "id": 31,
-          "src": "img/mw2lefzi1klc.jpg"
-        },
-        {
-          "id": 32,
-          "src": "img/mw2leh937kga.jpg"
-        }
-      ],
-      "files": []
-    }
+  posts:[
+    { title:"첫 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 10월 29일", img:"", color:["#6f8fc7","#e9d9b8"] },
+    { title:"두 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#1c1c1c","#a82a2a"] },
+    { title:"세 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#d33a3a","#f4e6d2"] },
+    { title:"네 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#5d7a68","#d8cfa8"] }
   ],
-  "notices": [
-    {
-      "title": "LIST",
-      "date": "2026년 11월 5일",
-      "text": "\n{{hl:#111111,#ffffff|1,000턴 이상}} 진행한 친구들만 기재\n메인 배려는 따로 표기\n\n@qwerty  {{hl:#111111,#ffffff|7}}\n@kit {{hl:#111111,#ffffff|임찬희/류보민}}\n@puppy3 스즈미야 토오루\n@meowmoon Dante Romano\n@psmoke_nonsmoker 냐냐냥(지새벽)",
-      "img": "",
-      "images": [],
-      "files": []
-    },
-    {
-      "title": "NOTICE",
-      "date": "2026년 11월 5일",
-      "text": "{{hl:#111111,#ffffff|미(ミ) / 유이}} 그 외 다른 닉네임 언급 X\n로그 80% 에셋 20%\nONLY 1T3D \n\n{{hl:#111111,#ffffff|Teapot · Caveduck}} 外 다양판 플랫폼 이용하나 메인은 두 플랫폼 이용하고 있습니다\n{{hl:#111111,#ffffff|상호 배려가 어려운 경우}}는 절대 흔적 남기지 말아 주세요\n캐릭터에 대한 본명 언급 有 스포일러가 될 수 있습니다\n\n{{hl:#111111,#ffffff|NG}}\n- 드림 지우기, 견체 및 사찰\n- 허공저격, 발콕콕, 이슈에 말 심하게 얹으시는 분\n",
-      "img": "",
-      "images": [],
-      "files": []
-    }
+  notices:[
+    { title:"Notice 3 : Image, Text", date:"2026년 10월 29일", img:"", color:["#3f6fb3","#e0a96a"], text:"여기에 공지 내용을 입력하세요. 이미지와 텍스트를 함께 올릴 수 있어요." },
+    { title:"Notice 2 : Text",  date:"2024년 12월 15일", text:"텍스트만 있는 공지 예시입니다." },
+    { title:"Notice 1 : Image", date:"2024년 7월 19일",  img:"", color:["#9bb6d8","#efe7d8"], text:"" }
   ],
-  "tracks": [
-    {
-      "title": "Gorillaz - Feel Good Inc.",
-      "src": "https://youtu.be/-Fp0aTedjwI?si=fscXu4js1DFS1arr"
-    },
-    {
-      "title": "Gwen Stefani - Luxurious",
-      "src": "https://youtu.be/vIhlZKxi8AU?si=pVRruAgikz5NSL0P"
-    },
-    {
-      "title": "Mae Muller - Anticlimax",
-      "src": "https://youtu.be/utN3q6TiooE?si=gDHypQXlFaUJBRI7"
-    },
-    {
-      "title": "Isabel LaRosa - Famous ",
-      "src": "https://youtu.be/PCMdcIr02UE?si=E5HpX8xYyUADWMZ2"
-    },
-    {
-      "title": "Nujabes - Reflection Eternal",
-      "src": "https://youtu.be/GLGM8fxL020?si=XIzpfklOSN6qv7Rh"
-    },
-    {
-      "title": "Nujabes - aruarian dance",
-      "src": "https://youtu.be/qYcoJpqCha4?si=BHO8xisY2iMJkDzz"
-    },
-    {
-      "title": "Childish Gambino - Redbone",
-      "src": "https://youtu.be/CWUxKMF2w2U?si=PVozsL4bj-fPLpKT"
-    }
-  ],
-  "links": [],
-  "gh": {
-    "user": "luvme11",
-    "repo": "u2home"
-  },
-  "chat": {
-    "aName": "7",
-    "aHandle": "@7",
-    "aPhoto": "img/mw2meoehccho.jpg",
-    "bName": "U2",
-    "bHandle": "@u2",
-    "bPhoto": "img/mw2mf0owoax8.jpg"
-  },
-  "admin": {
-    "pw": "0220",
-    "vol": 8
-  }
+  tracks:[],   // 예: { title:"곡 제목", src:"https://youtu.be/영상아이디" }  (mp3 경로도 가능)
+  links:[],    // 예: { title:"트위터", url:"https://..." }
+  gh:{ user:"", repo:"" },
+  // 관리자 비밀번호 (관리자 > 홈에서 바꾸고 '코드 복사'로 올리면 모든 기기에 적용돼요)
+  admin:{ pw:"admin1234" },
+  // 대화형 분류의 두 사람 (프로필 이미지는 비우면 기본 아이콘)
+  chat:{ aName:"달", aHandle:"@moontsuki", aPhoto:"", bName:"해파리", bHandle:"@kurage", bPhoto:"" }
 };
 /* ========================================= */
 
@@ -954,12 +634,17 @@ function alignText(v, s, e, kind){
   const sel = v.slice(ls, le).trim() ? v.slice(ls, le) : "정렬할 내용", head = `:::${kind}\n`;
   return { value:v.slice(0, ls) + head + sel + "\n:::" + v.slice(le), a0:ls + head.length, a1:ls + head.length + sel.length };
 }
+// ```html 로 감싸지 않아도, <!doctype html> ~ </html> 로 된 통째 HTML 문서는 자동으로 디자인으로 보여줘요.
+function autoFence(text){
+  const parts = String(text || "").split(/```html[ \t]*\r?\n([\s\S]*?)\r?\n?```/);
+  return parts.map((t, i) => i % 2 ? "```html\n" + t + "\n```" : t.replace(/(^|\n)[ \t]*(<!doctype html[\s\S]*?<\/html>)/gi, (m, pre, doc) => pre + "```html\n" + doc + "\n```")).join("");
+}
 function bodyHtml(p){
   const imgs = {}, files = {};
   (p.images || []).forEach(im => imgs[im.id] = im.src);
   (p.files || []).forEach(f => files[f.id] = f);
   const out = [];
-  String(p.text || "").split(/```html[ \t]*\r?\n([\s\S]*?)\r?\n?```/).forEach((chunk, ci) => {
+  autoFence(p.text).split(/```html[ \t]*\r?\n([\s\S]*?)\r?\n?```/).forEach((chunk, ci) => {
   if(ci % 2){ out.push(htmlFrame(chunk)); return; }
   const proc = c2 => c2.split(/(\[\[(?:img|file):\d+\]\])/).forEach(t => {
     let m = t.match(/^\[\[img:(\d+)\]\]$/);
