@@ -1014,6 +1014,10 @@ function formView(name){
       <label style="display:flex;align-items:center;gap:6px;margin-top:10px"><input type="checkbox" id="gh-auto" style="width:auto;margin:0" ${autoOn() ? "checked" : ""}>저장할 때마다 자동으로 GitHub에 올리기</label>
       <div class="btns"><button class="btn pri" data-a="gpush">GitHub에 바로 올리기</button></div>
       <p>자동 올리기를 끄면 위 버튼으로 직접 올릴 수 있어요. '바로 올리기'는 지금 수정한 내용(글·설정·이미지 경로)을 저장소 index.html에 직접 반영해요. 코드 복사·붙여넣기를 대신해요.</p>
+    <h3 style="margin-top:18px">저장 공간 정리</h3>
+      <p>브라우저 저장 공간 사용량: <b>${Math.round(JSON.stringify({profile,covers,categories,posts,notices,tracks,links,gh,chat,admin:adminCfg}).length / 1024).toLocaleString()}KB</b> / 약 5,000KB (넘으면 저장이 안 돼요)</p>
+      <div class="btns"><button class="btn pri" data-a="gmig">이미지·파일을 GitHub로 옮기기</button></div>
+      <p>브라우저에 쌓여 있는 이미지와 첨부파일을 저장소의 <code>img</code>·<code>files</code> 폴더로 옮기고, 글에는 짧은 경로만 남겨요. 토큰 저장이 먼저 필요해요. 끝나면 사이트에도 자동으로 반영돼요.</p>
     <h3 style="margin-top:18px">방문자에게 보이게 하기</h3>
       <p>관리자 페이지의 수정 내용은 이 브라우저에만 저장돼요. 모두에게 보이려면 아래 순서로 올려 주세요.</p>
       <p>① 코드 복사 → ② GitHub에서 index.html 열기 → ③ <code>const DEFAULT = {...};</code> 부분을 붙여 넣고 Commit</p>
@@ -1057,7 +1061,7 @@ function renderAdmin(){
   AM.innerHTML = amenu === "게시글 카테고리" ? catView() : COLL[amenu] ? (edit ? editView(amenu) : listView(amenu)) : formView(amenu);
 }
 function persist(){
-  if(!saveData()) alert("저장 공간이 부족해서 이 브라우저에 저장하지 못했어요. 이미지 수를 줄여 주세요.");
+  if(!saveData()) alert("브라우저 저장 공간이 가득 차서 저장하지 못했어요.\n관리자 > GitHub 설정에서 토큰을 저장한 뒤 [이미지·파일을 GitHub로 옮기기]를 눌러 주세요.");
   renderHome(); renderNotice(); route(); autoPush();
   if(amenu === "음악"){ if(ti >= tracks.length) ti = 0; loadTrack(); }
 }
@@ -1069,6 +1073,7 @@ AM.onclick = e => {
   if(a === "tsave"){ const t = AM.querySelector("#gh-tok").value.trim(); if(t) setTok(t); AM.querySelector(".msg").textContent = t ? "토큰을 이 브라우저에 저장했어요." : "붙여 넣은 토큰이 없어요."; AM.querySelector("#gh-tok").value = ""; return; }
   if(a === "tdel"){ setTok(""); AM.querySelector(".msg").textContent = "저장된 토큰을 지웠어요."; return; }
   if(a === "ttest"){ ghTest(AM.querySelector(".msg")); return; }
+  if(a === "gmig"){ if(!ghReady()){ AM.querySelector(".msg").textContent = "계정명·저장소·토큰을 먼저 저장해 주세요."; return; } migrateToGithub(AM.querySelector(".msg")); return; }
   if(a === "gpush"){ if(!ghReady()){ AM.querySelector(".msg").textContent = "계정명·저장소·토큰을 먼저 저장해 주세요."; return; } ghPush(AM.querySelector(".msg")); return; }
   if(a === "chup"){ chatKey = b.dataset.who; AM.querySelector("#chat-file").click(); return; }
   if(a === "chdel"){
@@ -1315,6 +1320,33 @@ async function storeImage(file, max, q){
     if(!ghWarned){ ghWarned = true; alert("GitHub 업로드에 실패해서 이 브라우저에만 저장했어요.\n(" + err.message + ")\n관리자 > GitHub 설정에서 토큰과 권한을 확인해 주세요."); }
     return data;
   }
+}
+// 브라우저에 쌓인 이미지·파일(data:)을 GitHub의 img/files 폴더로 옮기고 글에는 짧은 경로만 남겨요 → 저장 공간이 비워져요
+async function migrateToGithub(m){
+  const items = [], addImg = (o, k) => { if(o && typeof o[k] === "string" && o[k].startsWith("data:image")) items.push({ o, k, kind:"img" }); };
+  addImg(profile, "photo"); addImg(chat, "aPhoto"); addImg(chat, "bPhoto");
+  [...posts, ...notices].forEach(x => {
+    addImg(x, "img");
+    (x.images || []).forEach(im => addImg(im, "src"));
+    (x.files || []).forEach(f => { if(typeof f.src === "string" && f.src.startsWith("data:") && !f.path) items.push({ o:f, k:"src", kind:"file" }); });
+  });
+  if(!items.length){ m.textContent = "옮길 이미지·파일이 없어요. (이미 모두 GitHub 경로예요)"; return; }
+  let ok = 0, fail = 0, last = "";
+  for(const it of items){
+    m.textContent = `GitHub로 옮기는 중… ${ok + fail + 1}/${items.length}`;
+    const mm = /^data:([^;,]+)[^,]*;base64,(.*)$/s.exec(it.o[it.k]); if(!mm){ fail++; continue; }
+    try{
+      const rnd = Date.now().toString(36) + Math.random().toString(36).slice(2, 6);
+      const ext = { "image/jpeg":"jpg", "image/png":"png", "image/gif":"gif", "image/webp":"webp" }[mm[1]] || "jpg";
+      const path = it.kind === "img" ? "img/" + rnd + "." + ext : "files/" + rnd + "-" + String(it.o.name || "file").replace(/[^\w.\-가-힣]/g, "_");
+      await ghApi("PUT", "/contents/" + encodeURI(path), { message:"Upload " + path, content:mm[2] });
+      PREV[path] = it.o[it.k]; it.o[it.k] = path; if(it.kind === "file") it.o.path = true; ok++;
+    }catch(err){ fail++; last = err.message; }
+  }
+  const saved = saveData(); renderHome(); renderNotice(); route();
+  if(ok){ m.textContent = `${ok}개 옮겼어요${fail ? ` (${fail}개 실패: ${last})` : ""}. 사이트에 반영하는 중…`; await ghPush(m); }
+  else m.textContent = `옮기지 못했어요: ${last || "알 수 없는 오류"}`;
+  if(ok && !saved) m.textContent += " (브라우저 저장은 아직 부족해요. 한 번 더 눌러 주세요)";
 }
 async function ghTest(m){
   m.textContent = "확인 중…";
