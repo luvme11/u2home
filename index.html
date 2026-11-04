@@ -358,43 +358,36 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:.35em;-webki
 /* ====== 여기만 고치면 내용이 바뀝니다 (관리자 페이지의 '코드 복사'로 만든 코드를 통째로 붙여 넣어도 돼요) ====== */
 // img: 이미지 파일 경로 (예: "img/photo1.jpg"). 비워 두면 그라데이션이 표시됩니다.
 const DEFAULT = {
-  "profile": {
-    "name": "U2",
-    "bio": "Ai Chat",
-    "tag": "#극온리/이입 #1T1D",
-    "blog": "iCloud",
-    "photo": "img/mw2axqudmv11.jpg"
-  },
-  "covers": {
-    "notice": "공지사항 커버",
-    "list": "목록형 커버",
-    "gallery": "갤러리형 커버"
-  },
-  "categories": [
-    {
-      "name": "분류 전체보기",
-      "children": []
-    }
+  profile:{ name:"유니콘 Yunicorn", bio:"나는 지금의 이야기를 하고 있는 거야", tag:"#MyHomepage", blog:"iCloud", photo:"" },
+  covers:{ notice:"공지사항 커버", list:"목록형 커버", gallery:"갤러리형 커버" },
+  // 카테고리: children 안에 또 children을 넣으면 하위 카테고리가 돼요
+  // view: 보이는 방식 (list=목록형, thumb=썸네일, webzine=웹진형, chat=대화형, video=동영상). 비우면 상위 카테고리를 따라가요
+  categories:[
+    { name:"분류 전체보기", children:[] },
+    { name:"목록형", view:"list", children:[ { name:"하위 카테고리", children:[] }, { name:"빈 카테고리", children:[] } ] },
+    { name:"썸네일", view:"thumb", children:[ { name:"갤러리형", children:[] } ] },
+    { name:"웹진형", view:"webzine", children:[] },
+    { name:"대화형", view:"chat", children:[] },
+    { name:"동영상", view:"video", children:[] }
   ],
-  "posts": [],
-  "notices": [],
-  "tracks": [],
-  "links": [],
-  "gh": {
-    "user": "luvme11",
-    "repo": "u2home"
-  },
-  "chat": {
-    "aName": "달",
-    "aHandle": "@moontsuki",
-    "aPhoto": "",
-    "bName": "해파리",
-    "bHandle": "@kurage",
-    "bPhoto": ""
-  },
-  "admin": {
-    "pw": "0220"
-  }
+  posts:[
+    { title:"첫 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 10월 29일", img:"", color:["#6f8fc7","#e9d9b8"] },
+    { title:"두 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#1c1c1c","#a82a2a"] },
+    { title:"세 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#d33a3a","#f4e6d2"] },
+    { title:"네 번째 글 제목", type:"", text:"여기에 글 내용을 입력하세요.", date:"2026년 9월 24일",  img:"", color:["#5d7a68","#d8cfa8"] }
+  ],
+  notices:[
+    { title:"Notice 3 : Image, Text", date:"2026년 10월 29일", img:"", color:["#3f6fb3","#e0a96a"], text:"여기에 공지 내용을 입력하세요. 이미지와 텍스트를 함께 올릴 수 있어요." },
+    { title:"Notice 2 : Text",  date:"2024년 12월 15일", text:"텍스트만 있는 공지 예시입니다." },
+    { title:"Notice 1 : Image", date:"2024년 7월 19일",  img:"", color:["#9bb6d8","#efe7d8"], text:"" }
+  ],
+  tracks:[],   // 예: { title:"곡 제목", src:"https://youtu.be/영상아이디" }  (mp3 경로도 가능)
+  links:[],    // 예: { title:"트위터", url:"https://..." }
+  gh:{ user:"", repo:"" },
+  // 관리자 비밀번호 (관리자 > 홈에서 바꾸고 '코드 복사'로 올리면 모든 기기에 적용돼요)
+  admin:{ pw:"admin1234" },
+  // 대화형 분류의 두 사람 (프로필 이미지는 비우면 기본 아이콘)
+  chat:{ aName:"달", aHandle:"@moontsuki", aPhoto:"", bName:"해파리", bHandle:"@kurage", bPhoto:"" }
 };
 /* ========================================= */
 
@@ -593,7 +586,7 @@ function drawList(){
   LS.page = Math.max(0, Math.min(LS.page, pages - 1));
   $("#l-title").textContent = LS.cat ? LS.cat.split(SEP).pop() : ALL;
   $("#l-count").textContent = list.length + "개의 글";
-  $("#l-admin").innerHTML = isAdmin ? `<button class="btn pri" data-qa="new">${LS.cat ? "+ 이 카테고리에 글쓰기" : "+ 새 글"}</button>` : "";
+  $("#l-admin").innerHTML = "";   // 글쓰기는 관리자 페이지에서만
   $("#l-items").classList.toggle("thumbs", thumb);
   $("#l-items").classList.toggle("chat", isChat(LS.cat));
   $("#l-items").innerHTML = list.slice(LS.page * per, (LS.page + 1) * per).map(({p,i}, k) => {
@@ -624,7 +617,7 @@ function renderList(cat, pi){
   if(changed || idx >= 0) LS.page = Math.max(0, Math.floor(list.findIndex(x => x.i === LS.sel) / perPage(cat)));
   drawList();
   const p = LS.sel != null ? posts[LS.sel] : null;
-  const qa = (isAdmin && p) ? `<div class="qa"><button class="btn" data-qa="edit" data-i="${LS.sel}">수정</button><button class="btn" data-qa="del" data-i="${LS.sel}">삭제</button></div>` : "";
+  const qa = "";   // 수정/삭제도 관리자 페이지에서만
   $("#l-body").innerHTML = qa + (isLocked(p)
     ? `<div class="lockbox">${lockIcon}<b>이 글은 잠겨 있습니다.</b><span>이 글을 보려면 암호를<br>입력하십시오.</span>
         <button class="lockbtn" data-lock="ask">암호 입력</button></div>`
@@ -632,7 +625,7 @@ function renderList(cat, pi){
     ? `<div class="memo-date">${esc(p.date)}</div><h1>${esc(p.title)}</h1>` +
       (p.type ? `<div class="pmeta"><span class="chip">${esc(p.type)}</span></div>` : "") +
       (p.img ? `<img class="pimg" src="${esc(p.img)}" alt="">` : "") + bodyHtml(p)
-    : `<p class="empty">보여줄 글이 없어요.</p>` + (isAdmin ? `<div class="btns"><button class="btn pri" data-qa="new">${LS.cat ? "+ 이 카테고리에 첫 글 쓰기" : "+ 새 글"}</button></div>` : ""));
+    : `<p class="empty">보여줄 글이 없어요.</p>`);
   $("#l-body").scrollTop = 0;
 }
 // 잠긴 글: [암호 입력] → 입력칸이 나오고, 맞으면 글이 열려요
