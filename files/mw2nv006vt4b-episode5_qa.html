@@ -1,0 +1,216 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Q&A</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
+<style>
+  :root {
+    --bg: #0b0b0b;
+    --line: #2b2b2b;
+    --text: #f2f2f2;
+    --muted: #8a8a8a;
+    --red: #d42b2b;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: #050505;
+    color: var(--text);
+    font-family: 'Pretendard', -apple-system, 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    padding: 0 0 96px;
+  }
+  .card { width: 590px; max-width: 100%; background: var(--bg); padding: 14px 14px 14px; }
+  .mono { font-family: ui-monospace, 'SF Mono', Menlo, Consolas, monospace; letter-spacing: .08em; }
+
+  /* 섹션 제목 */
+  .sec { display: flex; align-items: center; gap: 8px; height: 14px; font-size: 11px; margin: 0 0 8px; }
+  .sec b { font-weight: 700; letter-spacing: .1em; }
+  .sec span { color: var(--muted); font-size: 10px; }
+  .sec::after { content: ''; flex: 1; height: 1px; background: var(--line); }
+
+  .box { border: 1px solid var(--line); }
+
+  /* Q&A */
+  .qa { padding: 10px 13px 14px; }
+  .qa + .qa { border-top: 1px dashed #3a3a3a; padding: 14px 13px 12px; }
+  .qa-wrap { display: flex; gap: 11px; }
+  .badge { width: 20px; height: 20px; flex: none; display: grid; place-items: center; font-size: 11px; font-weight: 800; }
+  .badge.q { background: var(--red); color: #fff; }
+  .badge.a { border: 1px solid #bbb; color: #fff; }
+  .qa .who { font-size: 10px; line-height: 12px; color: var(--muted); margin-bottom: 7px; }
+  .qa .txt { font-size: 14px; line-height: 18px; }
+  .qa.q .txt { font-weight: 700; }
+
+  /* 수정 모드 */
+  body.editing [contenteditable] { outline: 1px dashed rgba(212, 43, 43, .55); outline-offset: 3px; cursor: text; }
+  body.editing [contenteditable]:focus { outline: 1px solid var(--red); background: rgba(212, 43, 43, .08); }
+
+  /* 하단 도구 막대 */
+  .toolbar {
+    position: fixed; left: 50%; bottom: 18px; transform: translateX(-50%);
+    display: flex; gap: 8px; padding: 8px; background: #151515; border: 1px solid #333;
+    z-index: 10; font-family: 'Pretendard', sans-serif;
+  }
+  .tbtn {
+    background: #0b0b0b; color: var(--text); border: 1px solid #555; padding: 9px 14px;
+    font: 600 13px 'Pretendard', sans-serif; cursor: pointer; white-space: nowrap;
+  }
+  .tbtn:hover { border-color: #fff; }
+  .tbtn.on { background: var(--red); border-color: var(--red); }
+
+  /* HTML 코드 창 */
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); display: none; align-items: center; justify-content: center; padding: 16px; z-index: 20; }
+  .modal.open { display: flex; }
+  .panel { width: 100%; max-width: 760px; max-height: 90vh; background: #121212; border: 1px solid #444; padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .panel h2 { font-size: 14px; }
+  .panel p { font-size: 12px; color: var(--muted); }
+  .panel textarea {
+    flex: 1; min-height: 300px; resize: none; background: #060606; color: #d6d6d6;
+    border: 1px solid #333; padding: 12px; font: 12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+  }
+  .panel .btns { display: flex; gap: 8px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+  <main class="card" id="card">
+    <div class="sec"><b class="mono">↘ Q&amp;A</b><span>랜덤 Q&amp;A</span></div>
+    <div class="box">
+      <div class="qa q">
+        <div class="qa-wrap">
+          <div class="badge q">Q</div>
+          <div>
+            <div class="who mono">RANDOM</div>
+            <div class="txt">방금 22가 웃었을 때 잠깐 멈칫한 것 같은데 기분 탓인가?</div>
+          </div>
+        </div>
+      </div>
+      <div class="qa">
+        <div class="qa-wrap">
+          <div class="badge a">A</div>
+          <div>
+            <div class="who mono">7</div>
+            <div class="txt">Shut up. The neon light just got in my eyes for a second.(닥쳐. 그냥 네온사인 불빛이 잠깐 눈에 들어온 것뿐이야.)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div id="editor-ui"></div>
+
+<script>
+  /* 도구 막대/코드 창은 여기서 만들어요 (내보내는 코드에는 들어가지 않음) */
+  const ui = document.getElementById('editor-ui');
+  ui.innerHTML = '';
+  function el(tag, props, kids) {
+    const e = document.createElement(tag);
+    Object.keys(props || {}).forEach(k => { if (k === 'text') e.textContent = props[k]; else e.setAttribute(k, props[k]); });
+    (kids || []).forEach(c => e.appendChild(c));
+    return e;
+  }
+  ui.appendChild(el('div', { class: 'toolbar', id: 'toolbar' }, [
+    el('button', { class: 'tbtn', id: 'editBtn', type: 'button', text: '✎ 수정 모드' }),
+    el('button', { class: 'tbtn', id: 'codeBtn', type: 'button', text: 'HTML 코드 받기' })
+  ]));
+  const ta = el('textarea', { id: 'codeBox', spellcheck: 'false' });
+  ta.readOnly = true;
+  ui.appendChild(el('div', { class: 'modal', id: 'modal' }, [
+    el('div', { class: 'panel' }, [
+      el('h2', { text: '수정한 내용이 반영된 HTML 코드' }),
+      el('p', { text: '복사해서 .html 파일로 저장하면 지금 화면 그대로 열려요. 그 파일에서도 또 수정할 수 있어요.' }),
+      ta,
+      el('div', { class: 'btns' }, [
+        el('button', { class: 'tbtn on', id: 'copyBtn', type: 'button', text: '코드 복사' }),
+        el('button', { class: 'tbtn', id: 'dlBtn', type: 'button', text: '.html 다운로드' }),
+        el('button', { class: 'tbtn', id: 'closeBtn', type: 'button', text: '닫기' })
+      ])
+    ])
+  ]));
+
+  const editBtn = document.getElementById('editBtn');
+  const codeBtn = document.getElementById('codeBtn');
+  const modal = document.getElementById('modal');
+  const codeBox = document.getElementById('codeBox');
+  const copyBtn = document.getElementById('copyBtn');
+  const dlBtn = document.getElementById('dlBtn');
+  const closeBtn = document.getElementById('closeBtn');
+
+  const EDIT_SEL = '.txt,.who,.badge,.sec b,.sec span';
+
+  /* ---- 수정 모드 ---- */
+  function setEditing(on) {
+    document.body.classList.toggle('editing', on);
+    document.querySelectorAll(EDIT_SEL).forEach(el => {
+      if (on) el.setAttribute('contenteditable', 'true');
+      else el.removeAttribute('contenteditable');
+    });
+    editBtn.textContent = on ? '✔ 수정 끝내기' : '✎ 수정 모드';
+    editBtn.classList.toggle('on', on);
+  }
+  editBtn.addEventListener('click', () => setEditing(!document.body.classList.contains('editing')));
+
+  // 붙여넣기는 글자만, Enter는 입력 종료, Shift+Enter로 줄바꿈
+  document.addEventListener('paste', e => {
+    const t = e.target.closest && e.target.closest('[contenteditable]');
+    if (!t) return;
+    e.preventDefault();
+    const text = (e.clipboardData || window.clipboardData).getData('text/plain');
+    document.execCommand('insertText', false, text);
+  });
+  document.addEventListener('keydown', e => {
+    const t = e.target.closest && e.target.closest('[contenteditable]');
+    if (t && e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); t.blur(); }
+  });
+
+  /* ---- HTML 코드 만들기 ---- */
+  function buildHTML() {
+    const clone = document.documentElement.cloneNode(true);
+    clone.querySelector('body').classList.remove('editing');
+    clone.querySelectorAll('[contenteditable]').forEach(el => el.removeAttribute('contenteditable'));
+    clone.querySelector('#editor-ui').innerHTML = '';
+    return '<!doctype html>\n' + clone.outerHTML;
+  }
+
+  function openModal() {
+    codeBox.value = buildHTML();
+    copyBtn.textContent = '코드 복사';
+    modal.classList.add('open');
+    codeBox.focus();
+    codeBox.select();
+  }
+  function closeModal() { modal.classList.remove('open'); }
+
+  codeBtn.addEventListener('click', openModal);
+  closeBtn.addEventListener('click', closeModal);
+  modal.addEventListener('click', e => { if (e.target === modal) closeModal(); });
+
+  copyBtn.addEventListener('click', async () => {
+    const text = codeBox.value;
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (e) {
+      codeBox.select();
+      document.execCommand('copy');
+    }
+    copyBtn.textContent = '복사 완료 ✔';
+    setTimeout(() => { copyBtn.textContent = '코드 복사'; }, 1800);
+  });
+
+  dlBtn.addEventListener('click', () => {
+    const blob = new Blob([codeBox.value], { type: 'text/html;charset=utf-8' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'episode5_qa.html';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+  });
+</script>
+</body>
+</html>
