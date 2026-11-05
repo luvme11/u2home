@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>BLUE FAIRY 페어틀</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#888;font-family:'Pretendard','Malgun Gothic',sans-serif;display:flex;justify-content:center}
+#wrap{width:544px;max-width:100%;background:#0c0d11;color:#fff}
+[contenteditable]:focus{outline:1px dashed #ff4d8d;outline-offset:2px}
+:root{--blue:#2347ff;--dark:#0c0d11}
+
+/* 툴바 */
+#bar{position:fixed;top:8px;right:8px;z-index:99;display:flex;gap:6px}
+#bar button{font:700 12px 'Malgun Gothic',sans-serif;padding:8px 12px;border:0;border-radius:6px;background:#fff;color:#111;cursor:pointer;box-shadow:0 2px 8px #0004}
+
+/* 상단/하단 바 */
+.top{height:32px;display:flex;justify-content:space-between;align-items:center;padding:0 14px;font-size:9px;font-weight:800;letter-spacing:.18em;background:var(--dark);color:#cfd2dc}
+.top .r{color:#4a6bff}
+.top.light{background:#fff;color:#111}
+.top.light .r{color:var(--blue)}
+
+/* 사진 */
+.photo{position:relative;aspect-ratio:544/652;overflow:hidden;background:#222;cursor:grab;user-select:none;touch-action:none}
+.photo .im{position:absolute;inset:0;background-size:cover;background-position:center;transform-origin:center;z-index:0}
+.p1 .im{background-image:linear-gradient(180deg,#c9748f 0%,#3b5f86 45%,#17405a 100%)}
+.p2 .im{background-image:linear-gradient(180deg,#555 0%,#8a8a85 60%,#ccc 100%)}
+.shade{position:absolute;inset:0;pointer-events:none;z-index:1}
+.s1{background:linear-gradient(180deg,#0c0d1100 52%,#0c0d1180 78%,#0c0d11 100%),linear-gradient(90deg,#0c0d1166 0%,#0c0d1100 38%)}
+.s2{background:linear-gradient(180deg,#fff0 50%,#ffffffa6 76%,#fff 98%),linear-gradient(90deg,#1c2026b3 0%,#1c202600 42%)}
+.photo .hint{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;text-align:center;line-height:1.6;font-size:13px;color:#fffb;pointer-events:none;z-index:2}
+.photo.has .hint{display:none}
+.photo .rec{position:absolute;left:8px;top:14px;font-size:9.5px;font-weight:800;letter-spacing:.1em;display:flex;align-items:center;gap:6px;z-index:3}
+.photo .rec::before{content:"";width:6px;height:6px;border-radius:50%;background:var(--blue)}
+.photo .rec.dk{color:#111}
+.photo .x{position:absolute;color:#3a5bff;font-size:11px;font-weight:700;z-index:3;pointer-events:none}
+.photo .side{position:absolute;right:6px;top:52%;writing-mode:vertical-rl;font-size:8px;letter-spacing:.3em;font-weight:700;color:#fffc;z-index:3}
+.photo .side.dk{color:#0008}
+.name{position:absolute;left:0;bottom:73px;background:var(--blue);color:#fff;font-size:19px;font-weight:800;padding:0 14px;line-height:36px;height:36px;z-index:3;min-width:60px}
+.lines{position:absolute;left:0;bottom:39px;z-index:3}
+.lines i{display:block;height:3px;background:var(--blue)}
+.lines i:first-child{width:47px;margin-bottom:5px}
+.lines i:last-child{width:29px}
+/* 사진 위 박스 */
+.frame{position:absolute;z-index:2;left:23.3%;top:17%;width:53%;height:34%;border:1px solid #ffffffd9;cursor:move}
+.frame.blue{border-color:var(--blue);border-right-color:#0006;border-bottom-color:#0006}
+.frame i{position:absolute;width:11px;height:11px;border-radius:50%;background:#fff}
+.frame.blue i{border:2px solid var(--blue)}
+.frame i{cursor:move}
+.frame i[data-c=tl]{left:-6px;top:-6px}
+.frame i[data-c=tr]{right:-6px;top:-6px}
+.frame i[data-c=bl]{left:-6px;bottom:-6px}
+.frame i[data-c=br]{right:-6px;bottom:-6px}
+.ctl{position:absolute;right:8px;top:8px;z-index:6;display:flex;gap:4px}
+.ctl button{font:700 11px 'Malgun Gothic',sans-serif;padding:5px 8px;border:0;border-radius:5px;background:#fffd;color:#111;cursor:pointer}
+.cap .ctl,.cap #bar{display:none}
+.lock .ctl{display:none}
+.lock .photo,.lock .frame{cursor:default}
+.lock .photo .im{pointer-events:none}
+
+/* 태그 */
+.tags{display:flex;gap:5px;flex-wrap:wrap}
+.tags span{font-size:10px;font-weight:800;padding:6px 8px;background:#fff;color:#111}
+.tags span.b{background:var(--blue);color:#fff}
+.tags span.k{background:#000;color:#fff}
+.bottom{background:var(--dark);padding:14px}
+
+/* 글 영역 */
+.text{padding:26px 18px 14px;background:var(--dark)}
+.text.light{background:#fff;color:#111}
+.q{font-family:Georgia,serif;font-size:44px;line-height:.6;color:var(--blue);height:22px;font-weight:700}
+.text h2{font-size:21px;font-weight:800;line-height:1.38;margin:8px 0 18px;letter-spacing:-.02em}
+.text p{font-size:12.5px;line-height:1.85;color:#b6b9c4;margin-bottom:14px;letter-spacing:-.01em}
+.text.light p{color:#333}
+.rows{margin-top:18px}
+.row{display:flex;align-items:center;border-top:1px solid #272a33;padding:13px 0}
+.light .row{border-top-color:#ddd}
+.row b{width:70px;font-size:8.5px;letter-spacing:.22em;color:#7d8190;font-weight:800;flex-shrink:0}
+.row span{font-size:12px;font-weight:800}
+
+/* 길드 */
+.guild{background:var(--blue);padding:16px 14px 20px;position:relative;overflow:hidden}
+.gtop{display:flex;align-items:center;gap:8px;font-size:8.5px;font-weight:800;letter-spacing:.2em}
+.gtop i{flex:1;height:1px;background:#fff8}
+.num{font-family:Georgia,'Times New Roman',serif;font-size:62px;line-height:1;color:transparent;-webkit-text-stroke:1px #fff;margin-top:12px}
+.gt{font-size:25px;font-weight:800;margin-top:-4px;letter-spacing:-.02em}
+.sub{font-size:8.5px;font-weight:800;letter-spacing:.2em;margin-top:8px;color:#dfe5ff}
+.big{font-size:66px;font-weight:900;line-height:1.05;margin-top:12px;letter-spacing:-.04em}
+.rank1{position:absolute;right:10px;top:150px;font-family:Georgia,serif;font-size:84px;color:transparent;-webkit-text-stroke:1px #ffffffaa;line-height:1}
+.hash{font-size:9.5px;font-weight:800;margin:8px 0 18px;letter-spacing:.04em}
+.guild h3{font-size:19px;font-weight:800;line-height:1.38;margin-bottom:14px;letter-spacing:-.02em}
+.guild p{font-size:12px;line-height:1.85;margin-bottom:12px;color:#fff}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);border-top:1px solid #fff8;border-bottom:1px solid #fff8;margin:20px 0}
+.stats div{padding:14px 12px;border-right:1px solid #fff8}
+.stats div:last-child{border-right:0}
+.stats b{display:block;font-size:18px;font-weight:900}
+.stats small{display:block;font-size:8px;letter-spacing:.2em;font-weight:800;margin-top:6px;color:#dfe5ff}
+.quote{border-left:3px solid #fff;padding:2px 0 2px 12px;margin:0 0 24px}
+.quote small{display:block;font-size:9px;font-weight:800;margin-bottom:6px}
+.quote p{margin:0;font-size:12px;line-height:1.7}
+.mh{font-size:8.5px;font-weight:800;letter-spacing:.2em;margin-bottom:10px}
+.m{display:flex;justify-content:space-between;align-items:center;border-top:1px solid #fff7;padding:13px 0}
+.m b{font-size:14px;font-weight:800}
+.m span{font-size:10px;font-weight:600}
+.m b.on{background:#fff;color:var(--blue);padding:2px 6px}
+
+/* 푸터 */
+.foot{background:var(--dark);padding:26px 16px 22px;position:relative;min-height:210px}
+.logo{font-family:Georgia,'Times New Roman',serif;font-size:48px;line-height:.92;font-weight:400;letter-spacing:-.01em}
+.fp{font-size:10.5px;color:#8f93a1;margin-top:18px}
+.since{position:absolute;left:16px;bottom:22px;font-size:8.5px;font-weight:800;letter-spacing:.22em;color:#8f93a1}
+.star{position:absolute;right:22px;top:22px}
+.bar{position:absolute;right:16px;bottom:34px;width:86px;height:28px;background:repeating-linear-gradient(90deg,#fff 0 2px,transparent 2px 3px,#fff 3px 4px,transparent 4px 7px,#fff 7px 10px,transparent 10px 11px)}
+.code{position:absolute;right:16px;bottom:18px;font-size:8px;font-weight:800;letter-spacing:.2em;color:#cfd8ff}
+@media print{#bar{display:none}}
+</style>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+</head>
+<body>
+
+<div id="bar">
+  <button onclick="savePNG()">🖼 이미지로 저장</button>
+  <button id="lockbtn" onclick="toggleLock()">🔓 이미지 잠금</button>
+  <button onclick="copyCode()">📋 HTML 코드 복사</button>
+  <button onclick="urlImg()">🔗 사진 주소로 넣기</button>
+  <button onclick="saveHTML()">💾 파일로 저장</button>
+</div>
+
+<div id="wrap">
+
+<!-- ========== 1. 나나냥 사진 ========== -->
+<div class="top"><span contenteditable>01 / ONLINE</span><span class="r" contenteditable>BLUE FAIRY</span></div>
+<div class="photo p1" data-x="0" data-y="0" data-s="1">
+  <div class="im"></div><div class="shade s1"></div>
+  <div class="hint">더블클릭 또는 오른쪽 위 🖼 버튼으로<br>이미지 넣기 · 드래그=이동 · 휠=확대/축소</div>
+  <div class="frame"><i data-c="tl"></i><i data-c="tr"></i><i data-c="bl"></i><i data-c="br"></i></div>
+  <div class="rec" contenteditable>REC · 21:35</div>
+  <span class="x" style="right:30px;top:80px">×</span><span class="x" style="left:10px;bottom:260px">×</span>
+  <div class="side" contenteditable>HUJISIM MASTER</div>
+  <div class="name" contenteditable>나나냥</div>
+  <div class="lines"><i></i><i></i></div>
+  <div class="ctl"><button data-a="in">＋</button><button data-a="out">－</button><button data-a="frame">박스</button><button data-a="pick">🖼</button><button data-a="reset">초기화</button></div>
+</div>
+<div class="bottom"><div class="tags"><span class="b" contenteditable>휴지심 길드마스터</span><span contenteditable>세우트 Lv.283</span><span contenteditable>넷카마?</span></div></div>
+
+<!-- ========== 2. 나나냥 글 ========== -->
+<div class="text">
+  <div class="q">“</div>
+  <h2 contenteditable>게임 ㅈ같이 한다니<br>그런 극찬을…</h2>
+  <p contenteditable>플래티넘 블론드에 별 모양 동공의 벽안, 고양이 같은 얼굴. 레이싱 재킷에 옆트임 롱스커트, 헤드셋까지 챙긴 아바타는 누가 봐도 귀엽게 꾸민 여캐다. 그런데 플레이는 정반대다. 빈틈이 보이면 바로 파고들고 지는 건 죽어도 싫어해서, “게임 더럽게 한다”는 말을 칭찬으로 듣는다.</p>
+  <p contenteditable>서버 1위 길드의 길마라 방송과 클립에도 자주 오르내린다. 게시판에는 ‘냐냐냥은 현실에서도 존예 꾸꾸꾸일 듯’ 같은 글이 심심찮게 올라온다. 여자라고 한 적은 한 번도 없다. 굳이 정정하기 귀찮았을 뿐이다.</p>
+  <div class="rows">
+    <div class="row"><b contenteditable>CLASS</b><span contenteditable>세우트 · 인간</span></div>
+    <div class="row"><b contenteditable>LEVEL</b><span contenteditable>283</span></div>
+    <div class="row"><b contenteditable>GUILD</b><span contenteditable>휴지심 · 길드마스터</span></div>
+    <div class="row"><b contenteditable>DISPLAY</b><span contenteditable>♀ · 오해 방치 중</span></div>
+  </div>
+</div>
+
+<!-- ========== 3. 지새벽 사진 ========== -->
+<div class="top light"><span contenteditable>02 / OFFLINE</span><span class="r" contenteditable>REAL LIFE</span></div>
+<div class="photo p2" data-x="0" data-y="0" data-s="1">
+  <div class="im"></div><div class="shade s2"></div>
+  <div class="hint">더블클릭 또는 오른쪽 위 🖼 버튼으로<br>이미지 넣기 · 드래그=이동 · 휠=확대/축소</div>
+  <div class="frame blue"><i data-c="tl"></i><i data-c="tr"></i><i data-c="bl"></i><i data-c="br"></i></div>
+  <div class="rec dk" contenteditable>FOCUS · 21:35</div>
+  <span class="x" style="right:24px;top:80px">×</span><span class="x" style="left:14px;bottom:250px">×</span>
+  <div class="side dk" contenteditable>SEOUL · 26</div>
+  <div class="name" contenteditable>지새벽</div>
+  <div class="lines"><i></i><i></i></div>
+  <div class="ctl"><button data-a="in">＋</button><button data-a="out">－</button><button data-a="frame">박스</button><button data-a="pick">🖼</button><button data-a="reset">초기화</button></div>
+</div>
+
+<!-- ========== 4. 지새벽 글 ========== -->
+<div class="text light" style="padding-top:14px">
+  <div class="tags"><span class="k" contenteditable>26男</span><span class="k" contenteditable>188cm</span><span class="b" contenteditable>큰테페</span><span class="b" contenteditable>패디과 휴학생</span></div>
+  <div class="q" style="margin-top:18px">“</div>
+  <h2 contenteditable>여자라고 한 적도 없는데<br>속은 사람이 바보 아님?</h2>
+  <p contenteditable>한국대 패디과 4학년 휴학생이자 2년째 집 근처 카페에서 일하는 알바생. 눈가까지 내려오는 갈색 직모와 벽안, 여우상 얼굴 때문에 첫인상은 세련되고 예민해서 쉽게 말 걸기 어렵다. 웃으면 훨씬 어려 보이지만 입을 열면 반말에 독설부터 나온다.</p>
+  <p contenteditable>자존심을 건드리면 바로 시비를 걸고, 투닥거리는 걸 은근히 즐긴다. 그러면서도 한번 곁을 내준 사람의 사소한 취향은 기억해 뒀다가 아무렇지 않은 척 챙긴다. 진지한 말에는 일단 농담부터 던지고 보는 외강내유 타입.</p>
+  <div class="rows">
+    <div class="row"><b contenteditable>AGE</b><span contenteditable>26세</span></div>
+    <div class="row"><b contenteditable>HEIGHT</b><span contenteditable>188cm</span></div>
+    <div class="row"><b contenteditable>JOB</b><span contenteditable>패디과 휴학 · 카페 알바</span></div>
+    <div class="row"><b contenteditable>HOME</b><span contenteditable>대학가 근처 오피스텔</span></div>
+  </div>
+</div>
+
+<!-- ========== 5. 소속 길드 ========== -->
+<div class="guild">
+  <div class="gtop"><span contenteditable>GUILD</span><i></i><span contenteditable>BF</span></div>
+  <div class="num" contenteditable>03</div>
+  <div class="gt" contenteditable>소속 길드</div>
+  <div class="sub" contenteditable>HUJISIM · SERVER RANK 1</div>
+  <div class="big" contenteditable>휴지심</div>
+  <div class="rank1" contenteditable>#1</div>
+  <div class="sub" contenteditable>BLUE FAIRY NO.1 GUILD</div>
+  <div class="hash" contenteditable>#통합랭킹1위 #자유분방 #레이드 #밈</div>
+  <h3 contenteditable>서버가 시끄러우면,<br>대개 휴지심이 움직인 뒤다.</h3>
+  <p contenteditable>명실상부 블루페어리 1위 길드. 공략은 빠르고 레이드는 안정적이며, 각종 이슈와 서버 화제성까지 끌고 다닌다.</p>
+  <p contenteditable>길드원들은 자유분방하고 제각각 튄다. 길드 채팅은 늘 시비와 태클, 짧은 변명으로 시끄럽고 칭찬보다 놀림이 먼저 나온다. 그래도 누가 무너지면 가장 먼저 백업이 들어온다. 그 개성이 한 방향으로 몰리는 순간, 휴지심은 가장 예측하기 어렵고 가장 무서운 길드가 된다.</p>
+  <div class="stats">
+    <div><b contenteditable>#1</b><small contenteditable>RANK</small></div>
+    <div><b contenteditable>46</b><small contenteditable>MEMBERS</small></div>
+    <div><b contenteditable>밈</b><small contenteditable>FAME</small></div>
+  </div>
+  <div class="quote">
+    <small contenteditable>나나냥의 자리</small>
+    <p contenteditable><b>휴지심의 길드마스터.</b> 평소엔 시비나 걸고 다니는 것 같아도 길드 분위기가 처지면 제일 먼저 판을 흔든다.<br>길드원이 무시당하면 투덜대면서도 가장 먼저 나선다.</p>
+  </div>
+  <div class="mh" contenteditable>GUILD MEMBERS</div>
+  <div class="m"><b class="on" contenteditable>나나냥</b><span contenteditable>길드마스터 · 세우트</span></div>
+  <div class="m"><b contenteditable>빠삐코</b><span contenteditable>부길드마스터 · 발키리</span></div>
+  <div class="m"><b contenteditable>직살</b><span contenteditable>소울이터 · 클래스 1위</span></div>
+  <div class="m"><b contenteditable>뉴비임미다</b><span contenteditable>어비스나이트 · 클래스 1위</span></div>
+  <div class="m"><b contenteditable>부먹파인애플피자</b><span contenteditable>원창 · 클래스 3위</span></div>
+  <div class="m"><b contenteditable>가나다라맙소사</b><span contenteditable>헤카르 · PvP 랭커</span></div>
+  <div class="m"><b contenteditable>시비걸면힐안함</b><span contenteditable>바드 · PvP 랭커</span></div>
+  <div class="m"><b contenteditable>내잘못아님</b><span contenteditable>베니토르</span></div>
+  <div class="m"><b contenteditable>습박힐던저</b><span contenteditable>바드</span></div>
+</div>
+
+<!-- ========== 6. 푸터 ========== -->
+<div class="foot">
+  <svg class="star" width="60" height="60" viewBox="0 0 60 60"><path d="M30 0C32 18 42 28 60 30C42 32 32 42 30 60C28 42 18 32 0 30C18 28 28 18 30 0Z" fill="#6f8dff"/><path d="M14 44C14.6 48 17 50 21 50.6C17 51.2 14.6 53.2 14 57C13.4 53.2 11 51.2 7 50.6C11 50 13.4 48 14 44Z" fill="#8f93a1" transform="translate(-8 -2) scale(.9)"/></svg>
+  <div class="logo" contenteditable>BLUE<br>FAIRY</div>
+  <div class="fp" contenteditable>여자라고 한 적은 없다. 굳이 정정하기 귀찮았을 뿐이다.</div>
+  <div class="since" contenteditable>LASPERA · SINCE 2012</div>
+  <div class="bar"></div>
+  <div class="code" contenteditable>0806 1880</div>
+</div>
+
+</div>
+
+<input type="file" id="file" accept="image/*" style="display:none">
+<script>
+var locked=false;
+function toggleLock(){
+  locked=!locked;document.body.classList.toggle('lock',locked);
+  document.getElementById('lockbtn').textContent=locked?'🔒 잠금 해제':'🔓 이미지 잠금';
+}
+var target=null,fi=document.getElementById('file');
+function pick(el){target=el;fi.value='';fi.click();}
+fi.onchange=function(){
+  var f=fi.files[0];if(!f||!target)return;
+  var r=new FileReader();
+  r.onload=function(){target.querySelector('.im').style.backgroundImage='url("'+r.result+'")';target.classList.add('has');};
+  r.readAsDataURL(f);
+};
+function apply(el){
+  var x=+el.dataset.x,y=+el.dataset.y,s=+el.dataset.s;
+  el.querySelector('.im').style.transform='translate('+x+'%,'+y+'%) scale('+s+')';
+}
+function zoom(el,k){el.dataset.s=Math.min(6,Math.max(.3,+el.dataset.s*k));apply(el);}
+function pct(v,min,max){return Math.min(max,Math.max(min,v));}
+document.querySelectorAll('.photo').forEach(function(el){
+  apply(el);
+  var fr=el.querySelector('.frame');
+  // 사진 이동
+  el.addEventListener('pointerdown',function(e){
+    if(locked||e.target.closest('[contenteditable],.ctl,.frame'))return;
+    var sx=e.clientX,sy=e.clientY,ox=+el.dataset.x,oy=+el.dataset.y,w=el.clientWidth,h=el.clientHeight;
+    el.setPointerCapture(e.pointerId);el.style.cursor='grabbing';
+    function mv(ev){el.dataset.x=ox+(ev.clientX-sx)/w*100;el.dataset.y=oy+(ev.clientY-sy)/h*100;apply(el);}
+    function up(){el.removeEventListener('pointermove',mv);el.removeEventListener('pointerup',up);el.style.cursor='grab';}
+    el.addEventListener('pointermove',mv);el.addEventListener('pointerup',up);
+  });
+  // 확대/축소
+  el.addEventListener('wheel',function(e){if(locked)return;e.preventDefault();zoom(el,e.deltaY<0?1.06:1/1.06);},{passive:false});
+  el.addEventListener('dblclick',function(e){if(locked||e.target.closest('[contenteditable],.ctl,.frame'))return;pick(el);});
+  // 버튼
+  el.querySelector('.ctl').addEventListener('click',function(e){
+    var a=e.target.dataset.a;if(!a||locked)return;
+    if(a=='in')zoom(el,1.15);
+    if(a=='out')zoom(el,1/1.15);
+    if(a=='reset'){el.dataset.x=0;el.dataset.y=0;el.dataset.s=1;apply(el);}
+    if(a=='pick')pick(el);
+    if(a=='frame')fr.style.display=(fr.style.display=='none')?'':'none';
+  });
+  // 박스 이동 / 크기
+  fr.addEventListener('pointerdown',function(e){
+    e.stopPropagation();if(locked)return;e.preventDefault();
+    var W=el.clientWidth,H=el.clientHeight,c=null;
+    var L=fr.offsetLeft,T=fr.offsetTop,R=L+fr.offsetWidth,B=T+fr.offsetHeight,sx=e.clientX,sy=e.clientY;
+    fr.setPointerCapture(e.pointerId);
+    function mv(ev){
+      var dx=ev.clientX-sx,dy=ev.clientY-sy,l=L,t=T,r=R,b=B;
+      if(!c){l=L+dx;r=R+dx;t=T+dy;b=B+dy;}
+      else{
+        if(c[1]=='l')l=Math.min(L+dx,R-30);else r=Math.max(R+dx,L+30);
+        if(c[0]=='t')t=Math.min(T+dy,B-30);else b=Math.max(B+dy,T+30);
+      }
+      fr.style.left=l/W*100+'%';fr.style.top=t/H*100+'%';
+      fr.style.width=(r-l)/W*100+'%';fr.style.height=(b-t)/H*100+'%';
+    }
+    function up(){fr.removeEventListener('pointermove',mv);fr.removeEventListener('pointerup',up);}
+    fr.addEventListener('pointermove',mv);fr.addEventListener('pointerup',up);
+  });
+});
+function clean(node){
+  node.querySelectorAll('[contenteditable]').forEach(function(n){n.removeAttribute('contenteditable')});
+  node.querySelectorAll('.hint,.ctl').forEach(function(n){n.remove()});
+  node.querySelectorAll('.photo,.frame').forEach(function(n){n.style.cursor='default'});
+  return node;
+}
+function saveHTML(){
+  var c=document.documentElement.cloneNode(true);
+  c.querySelector('#file').remove();
+  var blob=new Blob(['<!DOCTYPE html>\n'+c.outerHTML],{type:'text/html'});
+  var a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='pair_title.html';a.click();
+}
+function copyCode(){
+  var w=clean(document.getElementById('wrap').cloneNode(true));
+  var css=document.querySelector('style').textContent
+    .replace(/body\{[^}]*\}/,'').replace(/#bar[^}]*\}/g,'').replace(/@media print\{[^}]*\}/,'');
+  var link='<link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.css">\n';
+  var code=link+'<style>'+css+'</style>\n'+w.outerHTML;
+  function ok(){alert('HTML 코드가 복사됐어요! 붙여넣기(Ctrl+V) 하세요.')}
+  function fb(){var t=document.createElement('textarea');t.value=code;document.body.appendChild(t);t.select();document.execCommand('copy');t.remove();ok()}
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(code).then(ok,fb)}else{fb()}
+}
+function savePNG(){
+  if(document.activeElement)document.activeElement.blur();
+  document.body.classList.add('cap');
+  html2canvas(document.getElementById('wrap'),{scale:2,useCORS:true,backgroundColor:null}).then(function(cv){
+    document.body.classList.remove('cap');
+    var a=document.createElement('a');a.href=cv.toDataURL('image/png');a.download='pair_title.png';a.click();
+  },function(){document.body.classList.remove('cap');alert('이미지 저장에 실패했어요.')});
+}
+function urlImg(){
+  var n=prompt('몇 번째 사진에 넣을까요? (1 = 나나냥, 2 = 지새벽)');
+  var el=document.querySelectorAll('.photo')[parseInt(n)-1];
+  if(!el)return;
+  var u=prompt('이미지 주소를 붙여넣으세요 (https://...)');
+  if(!u)return;
+  el.querySelector('.im').style.backgroundImage='url("'+u+'")';el.classList.add('has');
+}
+</script>
+</body>
+</html>
