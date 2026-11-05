@@ -291,6 +291,9 @@ mark.hlc{background:none;color:inherit;padding:0 .3em;border-radius:0;-webkit-bo
 @media (min-width:721px){.memo{height:calc(100% + 28px)}}
 /* wide: 글 목록을 접고 본문을 넓게 */
 .window.wide .memo-list{display:none}
+/* wide: 본문 글도 칸 끝까지 넓게 (평소엔 글 폭 제한이 있어서 wide에서만 풀어줘요) */
+.window.wide .memo-body p,.window.wide .memo-body blockquote.q,.window.wide .post p{max-width:none}
+.window.wide .post{max-width:none}
 /* mode: 글 목록(제목·배경)만 색이 바뀌어요. 버튼의 점 색 = 목록 제목 색 = 목록 배경 색 */
 .window[data-mode=rose]{--mc:#dd8f84}
 .window[data-mode=green]{--mc:#3f7a58}
@@ -509,7 +512,7 @@ const DEFAULT = {
       "images": [
         {
           "id": 1,
-          "src": "img/mw2ym518c79k.jpg"
+          "src": "img/mw2yi6elkxbp.jpg"
         }
       ],
       "files": []
