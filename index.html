@@ -2501,7 +2501,10 @@ async function ghPush(m){
     const f = await ghApi("GET", "/contents/index.html");          // sha 확인용
     let src = f.content && f.encoding === "base64" ? unb64utf8(f.content) : "";
     let loc = src ? findDefault(src) : null;
-    if(!loc){ src = await ghGetText("index.html"); loc = findDefault(src); }   // 비었거나 못 찾으면 원본을 직접 받아 다시 시도
+    if(!loc){                                                       // 1MB 넘는 파일은 content가 비어 오므로 Git blob으로 받아요 (최대 100MB)
+      try{ const b = await ghApi("GET", "/git/blobs/" + f.sha); src = b.content ? unb64utf8(b.content) : ""; loc = src ? findDefault(src) : null; }catch(e){ src = ""; }
+    }
+    if(!loc){ const t = await ghGetText("index.html"); if(t.length > src.length) src = t; loc = findDefault(src); }   // 그래도 못 찾으면 raw로 다시 시도
     if(!loc) throw new Error("저장소의 index.html에서 'const DEFAULT = {…}' 부분을 찾지 못했어요. (받은 파일 " + src.length + "자) 저장소의 index.html을 이 사이트의 최신 파일로 한 번 교체해 주세요.");
     const code = "const DEFAULT = " + JSON.stringify({profile,covers,categories,posts,notices,tracks,links,gh,chat,admin:adminCfg}, null, 2).replace(/</g, "\\u003c") + ";";
     m.textContent = "3/3 index.html 올리는 중…";
