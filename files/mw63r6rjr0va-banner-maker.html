@@ -1,0 +1,366 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>배너 메이커 400×80</title>
+<style>
+  /* 레이아웃: 위에 400×80 미리보기 스테이지, 아래에 조절 패널 2열 */
+  :root {
+    --bg: #f3f4f6;
+    --panel: #ffffff;
+    --fg: #16181d;
+    --muted: #606673;
+    --line: #d9dce3;
+    --accent: #2f5bea;
+    --accent-fg: #ffffff;
+    --stage: #e6e8ee;
+    --check-a: #ffffff;
+    --check-b: #d4d7de;
+    --font: system-ui, -apple-system, "Apple SD Gothic Neo", "Malgun Gothic", "Noto Sans KR", sans-serif;
+    --mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14161b; --panel: #1d2027; --fg: #eceef3; --muted: #9aa1af; --line: #333844;
+      --accent: #7b9bff; --accent-fg: #0e1220; --stage: #101217; --check-a: #2a2d35; --check-b: #20232a;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14161b; --panel: #1d2027; --fg: #eceef3; --muted: #9aa1af; --line: #333844;
+    --accent: #7b9bff; --accent-fg: #0e1220; --stage: #101217; --check-a: #2a2d35; --check-b: #20232a;
+    color-scheme: dark;
+  }
+
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: var(--font);
+    font-size: 14px;
+    line-height: 1.5;
+    padding-block: 24px 40px;
+    padding-left: max(16px, env(safe-area-inset-left, 0px));
+    padding-right: max(16px, env(safe-area-inset-right, 0px));
+  }
+  .wrap { max-width: 880px; margin: 0 auto; display: flex; flex-direction: column; gap: 16px; }
+  header { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+  h1 { margin: 0; font-size: 20px; letter-spacing: -0.01em; }
+  .spec { font-family: var(--mono); font-size: 12px; color: var(--muted); }
+
+  .stage-box {
+    background: var(--stage);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 20px;
+    display: flex; flex-direction: column; gap: 10px; align-items: center;
+  }
+  .frame { position: relative; width: 100%; max-width: 800px; aspect-ratio: 5 / 1; }
+  canvas#view {
+    width: 100%; height: 100%; display: block;
+    background-image:
+      linear-gradient(45deg, var(--check-b) 25%, transparent 25%, transparent 75%, var(--check-b) 75%),
+      linear-gradient(45deg, var(--check-b) 25%, var(--check-a) 25%, var(--check-a) 75%, var(--check-b) 75%);
+    background-size: 16px 16px;
+    background-position: 0 0, 8px 8px;
+    outline: 1px solid var(--accent);
+    cursor: grab;
+    touch-action: none;
+  }
+  canvas#view.dragging { cursor: grabbing; }
+  .empty {
+    position: absolute; inset: 0; display: flex; align-items: center; justify-content: center;
+    text-align: center; color: var(--muted); font-size: 13px; pointer-events: none; padding: 0 12px;
+  }
+  .stage-hint { color: var(--muted); font-size: 12px; text-align: center; }
+
+  .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } }
+  .panel {
+    background: var(--panel);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: 16px;
+    display: flex; flex-direction: column; gap: 14px;
+    min-width: 0;
+  }
+  .panel h2 { margin: 0; font-size: 12px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+
+  .row { display: grid; grid-template-columns: 52px 1fr 72px; align-items: center; gap: 10px; }
+  .row label { color: var(--muted); font-size: 13px; }
+  input[type="range"] { width: 100%; accent-color: var(--accent); margin: 0; min-width: 0; }
+  input[type="number"], select {
+    width: 100%; padding: 6px 8px; border: 1px solid var(--line); border-radius: 4px;
+    background: var(--bg); color: var(--fg); font-family: var(--mono); font-size: 13px;
+  }
+  input[type="color"] { width: 40px; height: 30px; padding: 0; border: 1px solid var(--line); border-radius: 4px; background: none; }
+
+  .btns { display: flex; flex-wrap: wrap; gap: 8px; }
+  button, .filebtn {
+    font: inherit; font-size: 13px; padding: 8px 12px; border-radius: 4px; cursor: pointer;
+    border: 1px solid var(--line); background: var(--bg); color: var(--fg);
+  }
+  button:hover, .filebtn:hover { border-color: var(--accent); }
+  button:focus-visible, .filebtn:focus-within, input:focus-visible, select:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-fg); font-weight: 600; }
+  .filebtn { display: inline-flex; align-items: center; }
+  .filebtn input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+
+  .opts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+  .opts label { display: inline-flex; align-items: center; gap: 6px; color: var(--muted); font-size: 13px; }
+  .opts select { width: auto; }
+
+  .result { display: none; flex-direction: column; gap: 8px; }
+  .result.show { display: flex; }
+  .result img { max-width: 100%; border: 1px solid var(--line); background: var(--stage); image-rendering: auto; align-self: flex-start; }
+  .note { color: var(--muted); font-size: 12px; margin: 0; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>배너 메이커</h1>
+    <span class="spec">출력 크기 400 × 80 px</span>
+  </header>
+
+  <section class="stage-box" id="drop">
+    <div class="frame">
+      <canvas id="view" width="800" height="160"></canvas>
+      <div class="empty" id="empty">이미지를 여기에 끌어다 놓거나 아래 &lsquo;이미지 선택&rsquo;을 누르세요</div>
+    </div>
+    <div class="stage-hint">파란 테두리가 저장될 400×80 영역입니다. 화면에서 드래그하면 이동, 마우스 휠로 확대·축소합니다.</div>
+  </section>
+
+  <div class="grid">
+    <section class="panel">
+      <h2>이미지</h2>
+      <div class="btns">
+        <label class="filebtn">이미지 선택<input type="file" id="file" accept="image/*"></label>
+        <button type="button" id="cover">꽉 채우기</button>
+        <button type="button" id="contain">전체 보이기</button>
+        <button type="button" id="orig">원본 크기</button>
+        <button type="button" id="reset">초기화</button>
+      </div>
+      <div class="row">
+        <label for="zoom">크기</label>
+        <input type="range" id="zoom" min="10" max="400" step="1" value="100">
+        <input type="number" id="zoomN" min="10" max="400" step="1" value="100">
+      </div>
+      <div class="row">
+        <label for="px">가로 위치</label>
+        <input type="range" id="px" min="-400" max="400" step="1" value="0">
+        <input type="number" id="pxN" step="1" value="0">
+      </div>
+      <div class="row">
+        <label for="py">세로 위치</label>
+        <input type="range" id="py" min="-200" max="200" step="1" value="0">
+        <input type="number" id="pyN" step="1" value="0">
+      </div>
+      <p class="note">크기 100%는 배너를 꽉 채우는 크기입니다. 위치 0은 가운데입니다.</p>
+    </section>
+
+    <section class="panel">
+      <h2>저장</h2>
+      <div class="opts">
+        <label>배경색 <input type="color" id="bg" value="#ffffff"></label>
+        <label><input type="checkbox" id="transp"> 투명 배경</label>
+      </div>
+      <div class="opts">
+        <label>형식
+          <select id="fmt">
+            <option value="png">PNG</option>
+            <option value="jpg">JPG</option>
+          </select>
+        </label>
+        <label>해상도
+          <select id="mult">
+            <option value="1">1× (400×80)</option>
+            <option value="2" selected>2× (800×160)</option>
+            <option value="3">3× (1200×240)</option>
+          </select>
+        </label>
+      </div>
+      <div class="btns">
+        <button type="button" class="primary" id="save">이미지 저장</button>
+      </div>
+      <div class="result" id="result">
+        <img id="resultImg" alt="저장된 배너 미리보기">
+        <p class="note" id="resultNote"></p>
+      </div>
+      <p class="note">JPG는 투명을 지원하지 않아 배경색으로 채워집니다. 저장이 막힌 환경이면 위에 나타나는 이미지를 길게 누르거나 우클릭해서 저장하세요.</p>
+    </section>
+  </div>
+</div>
+
+<script>
+(function () {
+  var W = 400, H = 80, PREVIEW_K = 2;
+  var S = { img: null, zoom: 100, x: 0, y: 0 };
+  var view = document.getElementById('view');
+  var vctx = view.getContext('2d');
+  var $ = function (id) { return document.getElementById(id); };
+
+  function base() { return S.img ? Math.max(W / S.img.naturalWidth, H / S.img.naturalHeight) : 1; }
+
+  function draw(ctx, k, forceFill) {
+    ctx.clearRect(0, 0, W * k, H * k);
+    var fill = forceFill || !$('transp').checked;
+    if (fill) { ctx.fillStyle = $('bg').value; ctx.fillRect(0, 0, W * k, H * k); }
+    if (!S.img) return;
+    var s = base() * S.zoom / 100;
+    var dw = S.img.naturalWidth * s, dh = S.img.naturalHeight * s;
+    var cx = W / 2 + S.x, cy = H / 2 + S.y;
+    ctx.imageSmoothingEnabled = true;
+    ctx.imageSmoothingQuality = 'high';
+    ctx.drawImage(S.img, (cx - dw / 2) * k, (cy - dh / 2) * k, dw * k, dh * k);
+  }
+
+  function render() {
+    draw(vctx, PREVIEW_K, false);
+    $('empty').style.display = S.img ? 'none' : 'flex';
+  }
+
+  function clamp(v, a, b) { return Math.min(b, Math.max(a, v)); }
+
+  function sync() {
+    S.zoom = clamp(Math.round(S.zoom * 10) / 10, 10, 400);
+    S.x = Math.round(S.x);
+    S.y = Math.round(S.y);
+    $('zoom').value = S.zoom; $('zoomN').value = S.zoom;
+    var xr = Math.max(400, Math.abs(S.x)), yr = Math.max(200, Math.abs(S.y));
+    $('px').min = -xr; $('px').max = xr; $('py').min = -yr; $('py').max = yr;
+    $('px').value = S.x; $('pxN').value = S.x;
+    $('py').value = S.y; $('pyN').value = S.y;
+    render();
+  }
+
+  function bindPair(rangeId, numId, key, min, max) {
+    var onIn = function (e) {
+      var v = parseFloat(e.target.value);
+      if (isNaN(v)) return;
+      S[key] = (min === null) ? v : clamp(v, min, max);
+      sync();
+    };
+    $(rangeId).addEventListener('input', onIn);
+    $(numId).addEventListener('input', onIn);
+  }
+  bindPair('zoom', 'zoomN', 'zoom', 10, 400);
+  bindPair('px', 'pxN', 'x', null);
+  bindPair('py', 'pyN', 'y', null);
+
+  function loadFile(f) {
+    if (!f) return;
+    var msg = $('empty');
+    var reader = new FileReader();
+    reader.onerror = function () {
+      msg.style.display = 'flex';
+      msg.textContent = '파일을 읽지 못했습니다. 다른 이미지로 다시 시도하세요.';
+    };
+    reader.onload = function () {
+      var im = new Image();
+      im.onload = function () {
+        S.img = im; S.zoom = 100; S.x = 0; S.y = 0;
+        sync();
+      };
+      im.onerror = function () {
+        msg.style.display = 'flex';
+        msg.textContent = '이 파일은 브라우저에서 열 수 없는 형식입니다. PNG, JPG, WebP 파일을 사용하세요. (HEIC는 JPG로 변환 필요)';
+      };
+      im.src = reader.result;
+    };
+    reader.readAsDataURL(f);
+  }
+  $('file').addEventListener('change', function (e) {
+    loadFile(e.target.files[0]);
+    e.target.value = '';
+  });
+
+  var drop = $('drop');
+  ['dragenter', 'dragover'].forEach(function (t) {
+    drop.addEventListener(t, function (e) { e.preventDefault(); });
+  });
+  drop.addEventListener('drop', function (e) {
+    e.preventDefault();
+    if (e.dataTransfer.files && e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]);
+  });
+  window.addEventListener('paste', function (e) {
+    var items = (e.clipboardData && e.clipboardData.items) || [];
+    for (var i = 0; i < items.length; i++) {
+      if (items[i].type.indexOf('image/') === 0) { loadFile(items[i].getAsFile()); break; }
+    }
+  });
+
+  // 드래그로 이동
+  var drag = null;
+  view.addEventListener('pointerdown', function (e) {
+    if (!S.img) return;
+    view.setPointerCapture(e.pointerId);
+    view.classList.add('dragging');
+    drag = { sx: e.clientX, sy: e.clientY, ox: S.x, oy: S.y };
+  });
+  view.addEventListener('pointermove', function (e) {
+    if (!drag) return;
+    var r = view.getBoundingClientRect();
+    var f = W / r.width;
+    S.x = drag.ox + (e.clientX - drag.sx) * f;
+    S.y = drag.oy + (e.clientY - drag.sy) * f;
+    sync();
+  });
+  function endDrag() { drag = null; view.classList.remove('dragging'); }
+  view.addEventListener('pointerup', endDrag);
+  view.addEventListener('pointercancel', endDrag);
+
+  // 휠로 확대·축소
+  view.addEventListener('wheel', function (e) {
+    if (!S.img) return;
+    e.preventDefault();
+    S.zoom = S.zoom * Math.exp(-e.deltaY * 0.0015);
+    sync();
+  }, { passive: false });
+
+  // 빠른 맞춤 버튼
+  $('cover').addEventListener('click', function () { S.zoom = 100; S.x = 0; S.y = 0; sync(); });
+  $('contain').addEventListener('click', function () {
+    if (!S.img) return;
+    var c = Math.min(W / S.img.naturalWidth, H / S.img.naturalHeight);
+    S.zoom = 100 * c / base(); S.x = 0; S.y = 0; sync();
+  });
+  $('orig').addEventListener('click', function () {
+    if (!S.img) return;
+    S.zoom = 100 / base(); S.x = 0; S.y = 0; sync();
+  });
+  $('reset').addEventListener('click', function () { S.zoom = 100; S.x = 0; S.y = 0; sync(); });
+
+  ['bg', 'transp'].forEach(function (id) { $(id).addEventListener('input', render); });
+
+  // 저장
+  var lastUrl = null;
+  $('save').addEventListener('click', function () {
+    var fmt = $('fmt').value;
+    var k = parseInt($('mult').value, 10);
+    var c = document.createElement('canvas');
+    c.width = W * k; c.height = H * k;
+    draw(c.getContext('2d'), k, fmt === 'jpg');
+    var mime = fmt === 'jpg' ? 'image/jpeg' : 'image/png';
+    var fname = 'banner-400x80' + (k > 1 ? '@' + k + 'x' : '') + '.' + fmt;
+    c.toBlob(function (blob) {
+      if (!blob) return;
+      if (lastUrl) URL.revokeObjectURL(lastUrl);
+      lastUrl = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = lastUrl; a.download = fname;
+      document.body.appendChild(a); a.click(); a.remove();
+      $('resultImg').src = lastUrl;
+      $('resultNote').textContent = fname + ' · ' + (W * k) + '×' + (H * k) + ' px · ' + Math.round(blob.size / 1024) + ' KB';
+      $('result').classList.add('show');
+    }, mime, 0.95);
+  });
+
+  sync();
+})();
+</script>
+</body>
+</html>
