@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+<title>발췌 프레임 (campus mp3 · 4:5)</title>
+<style>
+  :root {
+    --ink: #1f3446;            /* LCD 글자색 */
+    --lcd-1: #e2f0f1;
+    --lcd-2: #d3e7ea;
+    --lcd-bar: rgba(120,160,175,.26);
+    --lcd-line: #9db8c2;
+    --body-line: #d3dae5;
+    --label: #8e9bb0;
+    --font: -apple-system, BlinkMacSystemFont, 'SF Pro Text', 'Inter', 'Apple SD Gothic Neo', 'Noto Sans KR', 'Malgun Gothic', sans-serif;
+    --mono: 'SF Mono', ui-monospace, Menlo, 'D2Coding', Consolas, 'Noto Sans KR', monospace;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #777;                 /* 캡처용 바깥 배경 */
+    min-height: 100vh;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .canvas {
+    position: relative;
+    width: 1200px; height: 1500px;     /* 4:5 */
+    flex-shrink: 0; overflow: hidden;
+    font-family: var(--font);
+    color: var(--ink);
+    background:
+      radial-gradient(rgba(255,255,255,.75) 2px, transparent 2px) 0 0 / 28px 28px,
+      linear-gradient(135deg, #ebe8f8, #e2f0f3);
+  }
+
+  /* 목걸이 줄 (기기 뒤) */
+  .strap { position: absolute; inset: 0; width: 1200px; height: 1500px; pointer-events: none; z-index: 1; }
+
+  /* ===== 기기 본체 ===== */
+  .device {
+    position: absolute; z-index: 2;
+    left: 100px; top: 150px; width: 1000px; height: 1290px;
+    border-radius: 64px;
+    background: linear-gradient(#fdfdff, #e8ecf3);
+    border: 2px solid var(--body-line);
+    box-shadow:
+      0 34px 60px rgba(120,135,165,.30),
+      inset 0 2px 0 #fff,
+      inset 0 -4px 8px rgba(150,165,190,.22);
+  }
+
+  /* 상단 브랜드 줄 */
+  .brand {
+    position: absolute; z-index: 3; left: 150px; top: 176px;
+    display: flex; align-items: center; gap: 14px;
+    font-size: 19px; letter-spacing: 5px; color: var(--label);
+  }
+  .brand svg { opacity: .7; }
+  .grill { position: absolute; z-index: 3; right: 150px; top: 178px; display: grid; grid-template-columns: repeat(10, 6px); gap: 8px; }
+  .grill i { width: 6px; height: 6px; border-radius: 50%; background: #d5dbe5; display: block; }
+
+  /* 액정 베젤 */
+  .bezel {
+    position: absolute; z-index: 3;
+    left: 140px; top: 232px; width: 920px; height: 1032px;
+    border-radius: 28px;
+    background: linear-gradient(#cdd5e0, #e3e8ef);
+    border: 2px solid #b9c3d1;
+    box-shadow: inset 0 3px 6px rgba(90,105,130,.28), 0 2px 0 #fff;
+  }
+  /* 액정 */
+  .glass {
+    position: absolute; z-index: 3;
+    left: 160px; top: 248px; width: 880px; height: 1000px;
+    border-radius: 14px;
+    background: linear-gradient(var(--lcd-1), var(--lcd-2));
+    border: 2px solid #aebfca;
+    box-shadow: inset 0 0 24px rgba(80,120,140,.20);
+    overflow: hidden;
+  }
+  .glass::after {                      /* 주사선 */
+    content: ""; position: absolute; inset: 0; pointer-events: none;
+    background: repeating-linear-gradient(rgba(50,90,110,.05) 0 1px, transparent 1px 3px);
+  }
+
+  /* 액정 상단 상태줄 */
+  .status {
+    position: absolute; z-index: 4;
+    left: 160px; top: 248px; width: 880px; height: 50px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 24px;
+    background: var(--lcd-bar);
+    border-bottom: 2px solid var(--lcd-line);
+    border-radius: 14px 14px 0 0;
+    font-family: var(--mono); font-size: 18px; letter-spacing: 1px;
+  }
+  .status .grp { display: flex; align-items: center; gap: 14px; }
+
+  /* 액정 하단 재생줄 */
+  .foot {
+    position: absolute; z-index: 4;
+    left: 160px; top: 1186px; width: 880px; height: 62px;
+    display: flex; align-items: center; gap: 18px;
+    padding: 0 24px;
+    background: rgba(120,160,175,.18);
+    border-top: 2px solid var(--lcd-line);
+    border-radius: 0 0 14px 14px;
+    font-family: var(--mono); font-size: 17px; letter-spacing: 1px;
+  }
+  .seg { flex: 1; height: 16px; border: 2px solid var(--ink); padding: 2px; }
+  .seg i {
+    display: block; height: 100%; width: 38%;
+    background: repeating-linear-gradient(90deg, var(--ink) 0 8px, transparent 8px 11px);
+  }
+  .eq { display: flex; align-items: flex-end; gap: 3px; height: 22px; }
+  .eq i { width: 5px; background: var(--ink); display: block; }
+
+  /* 하단 조작부 */
+  .btn {
+    position: absolute; z-index: 3; top: 1318px;
+    width: 110px; height: 56px; border-radius: 28px;
+    background: linear-gradient(#ffffff, #eef1f6);
+    border: 1.5px solid var(--body-line);
+    box-shadow: 0 4px 8px rgba(130,145,170,.22), inset 0 1px 0 #fff;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn svg { display: block; }
+  .tiny { position: absolute; z-index: 3; font-size: 14px; letter-spacing: 3px; color: var(--label); font-family: var(--mono); }
+  .hold { position: absolute; z-index: 3; left: 150px; top: 1334px; width: 66px; height: 26px; border-radius: 13px; background: #e3e8f0; border: 1.5px solid var(--body-line); }
+  .hold i { position: absolute; left: 3px; top: 3px; width: 18px; height: 18px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(120,135,160,.4); }
+  .vol { position: absolute; z-index: 3; left: 900px; top: 1345px; width: 150px; height: 4px; border-radius: 2px; background: #dde3ec; }
+  .vol b { position: absolute; left: 0; top: 0; width: 60%; height: 4px; border-radius: 2px; background: #c3d3e6; }
+  .vol i { position: absolute; left: calc(60% - 9px); top: -7px; width: 18px; height: 18px; border-radius: 50%; background: #fff; border: 1.5px solid #c3d3e6; box-shadow: 0 1px 3px rgba(120,135,160,.3); }
+
+  /* 줄 위 고리 (기기 앞) */
+  .clasp { position: absolute; inset: 0; width: 1200px; height: 1500px; pointer-events: none; z-index: 6; }
+
+  /* ★ 빈 공간: 액정 안에 글을 적는 곳 ★ */
+  .content {
+    position: absolute; z-index: 5;
+    left: 0; top: 0; width: 1200px; height: 1500px;
+    padding: 326px 206px 648px 206px;   /* 위 / 오른쪽 / 아래 / 왼쪽 */
+    text-align: left;
+    display: flex; flex-direction: column; align-items: stretch;
+    justify-content: center;            /* center = 세로 가운데 / flex-start = 위쪽 */
+    gap: 22px;
+    font-size: 28px; line-height: 1.75;
+    outline: none;
+  }
+  .content:hover { outline: 1px dashed rgba(240,130,170,.35); }  /* 작업용 가이드, 캡처 땐 마우스 치우기 */
+</style>
+</head>
+<body>
+
+<div class="canvas" id="capture">
+
+  <!-- 목걸이 줄 -->
+  <svg class="strap" viewBox="0 0 1200 1500" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <path id="pl" d="M250 -30 L596 156"/>
+      <path id="pr" d="M604 156 L950 -30"/>
+    </defs>
+    <g stroke-linecap="butt">
+      <line x1="250" y1="-30" x2="596" y2="156" stroke="#bccfe9" stroke-width="34"/>
+      <line x1="950" y1="-30" x2="604" y2="156" stroke="#bccfe9" stroke-width="34"/>
+      <line x1="243.8" y1="-18.6" x2="589.8" y2="167.4" stroke="#a6bde0" stroke-width="1.6"/>
+      <line x1="256.2" y1="-41.4" x2="602.2" y2="144.6" stroke="#a6bde0" stroke-width="1.6"/>
+      <line x1="956.2" y1="-18.6" x2="610.2" y2="167.4" stroke="#a6bde0" stroke-width="1.6"/>
+      <line x1="943.8" y1="-41.4" x2="597.8" y2="144.6" stroke="#a6bde0" stroke-width="1.6"/>
+    </g>
+    <g font-family="Arial, sans-serif" font-size="14" letter-spacing="4" fill="#fff" opacity=".9">
+      <text dy="5"><textPath href="#pl" startOffset="60">UNIVERSITY · 2004 · UNIVERSITY · 2004 · UNIVERSITY · 2004 ·</textPath></text>
+      <text dy="5"><textPath href="#pr" startOffset="40">UNIVERSITY · 2004 · UNIVERSITY · 2004 · UNIVERSITY · 2004 ·</textPath></text>
+    </g>
+  </svg>
+
+  <!-- 본체 -->
+  <div class="device"></div>
+
+  <div class="brand">
+    <svg width="30" height="22" viewBox="0 0 28 20"><polygon points="14,1 27,7 14,13 1,7" fill="#8e9bb0"/><path d="M7 10.5 v4.5 q7 4 14 0 v-4.5 l-7 3z" fill="#8e9bb0"/><path d="M26 7.5 v7" stroke="#8e9bb0" stroke-width="1.6"/></svg>
+    <span contenteditable="true">CAMPUS PLAYER</span>
+  </div>
+  <div class="grill"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
+
+  <div class="bezel"></div>
+  <div class="glass"></div>
+
+  <!-- 상태줄 -->
+  <div class="status">
+    <div class="grp">
+      <svg width="30" height="22" viewBox="0 0 28 20"><polygon points="14,1 27,7 14,13 1,7" fill="#1f3446"/><path d="M7 10.5 v4.5 q7 4 14 0 v-4.5 l-7 3z" fill="#1f3446"/><path d="M26 7.5 v7" stroke="#1f3446" stroke-width="1.6"/></svg>
+      <span contenteditable="true">NOW PLAYING</span>
+    </div>
+    <div class="grp">
+      <span contenteditable="true">2004.XX.XX</span>
+      <svg width="34" height="18" viewBox="0 0 34 18"><rect x="1" y="2" width="28" height="14" rx="2" fill="none" stroke="#1f3446" stroke-width="2"/><rect x="30" y="6" width="3" height="6" fill="#1f3446"/><rect x="4" y="5" width="6" height="8" fill="#1f3446"/><rect x="12" y="5" width="6" height="8" fill="#1f3446"/><rect x="20" y="5" width="6" height="8" fill="#1f3446"/></svg>
+    </div>
+  </div>
+
+  <!-- 재생줄 -->
+  <div class="foot">
+    <span contenteditable="true">00:00</span>
+    <div class="seg"><i></i></div>
+    <span contenteditable="true">50:00</span>
+    <div class="eq"><i style="height:9px"></i><i style="height:18px"></i><i style="height:12px"></i><i style="height:22px"></i><i style="height:14px"></i></div>
+  </div>
+
+  <!-- 조작부 -->
+  <div class="hold"><i></i></div>
+  <div class="tiny" style="left:228px; top:1339px;">HOLD</div>
+
+  <div class="btn" style="left:344px;"><svg width="30" height="22" viewBox="0 0 30 22" fill="#9aa9bd"><rect x="2" y="2" width="4" height="18"/><polygon points="28,2 28,20 10,11"/></svg></div>
+  <div class="btn" style="left:478px;"><svg width="34" height="22" viewBox="0 0 34 22" fill="#9aa9bd"><polygon points="2,2 2,20 18,11"/><rect x="22" y="2" width="4" height="18"/><rect x="29" y="2" width="4" height="18"/></svg></div>
+  <div class="btn" style="left:612px;"><svg width="30" height="22" viewBox="0 0 30 22" fill="#9aa9bd"><polygon points="2,2 2,20 20,11"/><rect x="24" y="2" width="4" height="18"/></svg></div>
+  <div class="btn" style="left:746px;"><svg width="22" height="22" viewBox="0 0 22 22" fill="#9aa9bd"><rect x="3" y="3" width="16" height="16" rx="2"/></svg></div>
+
+  <div class="tiny" style="left:900px; top:1316px;">VOL</div>
+  <div class="vol"><b></b><i></i></div>
+
+  <!-- 빈 공간 -->
+  <div class="content" contenteditable="true">
+    <!-- 여기에 글 입력. 클릭해서 바로 타이핑해도 됨 -->
+  </div>
+
+  <!-- 줄 고리 (맨 앞) -->
+  <svg class="clasp" viewBox="0 0 1200 1500" xmlns="http://www.w3.org/2000/svg">
+    <rect x="582" y="132" width="36" height="32" rx="10" fill="#e3e8f0" stroke="#c4ccd9" stroke-width="2"/>
+    <circle cx="600" cy="148" r="7" fill="#fff" stroke="#b3bdcc" stroke-width="2.5"/>
+  </svg>
+
+</div>
+
+</body>
+</html>
